@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#edf2ef">
+  <meta name="description" content="Turn your PC sensor screen into a calm living miniature world. CPU, GPU, memory, network and disk telemetry, kept local.">
+  <title>Desktop Weather — a little world inside your PC</title>
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main id="app">
+    <header class="toolbar">
+      <a class="brand" href="./"><span class="brand-mark" aria-hidden="true">◈</span><span>desktop weather<small>A little world inside your PC</small></span></a>
+      <div class="toolbar-actions"><span id="source" class="status" role="status">Connecting</span><button id="settings-button" aria-expanded="false" aria-controls="settings">Settings</button><button id="fullscreen">Fullscreen</button><button id="hide-ui" title="Press K to restore controls">Screen mode</button></div>
+    </header>
+    <section id="scene" class="scene" aria-label="A Mediterranean miniature village animated by system activity">
+      <img id="village" src="assets/village.webp" alt="A peaceful terraced village, gardens and footbridges around a blue canal" width="1672" height="941">
+      <div class="light-wash" aria-hidden="true"></div>
+      <canvas id="weather" aria-hidden="true"></canvas>
+      <div class="scene-heading"><span class="eyebrow">THE QUIET COAST</span><h1 id="scene-title">A small world.<br>A living connection.</h1><p id="scene-description">Waiting for your computer’s heartbeat.</p></div>
+      <div class="scene-note"><span class="pulse" aria-hidden="true"></span><span id="scene-status">No readings yet</span></div>
+      <div class="scene-clock"><span id="clock"></span><small id="time-label">Morning light</small></div>
+    </section>
+    <section id="readings" class="readings" aria-label="System telemetry">
+      <article class="reading"><span class="metric-label">CPU <small>wind</small></span><strong id="cpu">—</strong><span id="cpu-detail" class="metric-detail">Waiting for a sample</span><div class="meter"><span id="cpu-bar"></span></div></article>
+      <article class="reading"><span class="metric-label">GPU <small>fireflies</small></span><strong id="gpu">—</strong><span id="gpu-detail" class="metric-detail">No GPU reading</span><div class="meter"><span id="gpu-bar"></span></div></article>
+      <article class="reading"><span class="metric-label">MEMORY <small>window glow</small></span><strong id="ram">—</strong><span id="ram-detail" class="metric-detail">No memory reading</span><div class="meter"><span id="ram-bar"></span></div></article>
+      <article class="reading"><span class="metric-label">NETWORK <small>gentle rain</small></span><strong id="network">—</strong><span id="network-detail" class="metric-detail">No network reading</span><div class="meter"><span id="network-bar"></span></div></article>
+      <article class="reading"><span class="metric-label">DISK <small>canal ripples</small></span><strong id="disk">—</strong><span id="disk-detail" class="metric-detail">No disk reading</span><div class="meter"><span id="disk-bar"></span></div></article>
+    </section>
+    <footer class="footer"><span id="footer-source">Local telemetry · no account · no cloud</span><span><a href="https://github.com/samoxis/desktop-weather" target="_blank" rel="noopener noreferrer">GitHub ↗</a><span class="keyboard-hint">K screen mode · F fullscreen</span></span></footer>
+    <aside id="settings" class="settings" hidden aria-label="Display settings">
+      <div class="settings-heading"><h2>Make it your little world</h2><button id="close-settings" aria-label="Close settings">✕</button></div>
+      <label>Data source<select id="mode"><option value="live">Live · this computer</option><option value="idle">Demo · quiet morning</option><option value="game">Demo · gaming</option><option value="render">Demo · rendering</option><option value="download">Demo · downloading</option></select></label>
+      <label>Light<select id="light"><option value="morning">Morning</option><option value="dusk">Golden hour</option><option value="night">Moonlight</option><option value="auto">Follow the local clock</option></select></label>
+      <label>Animation<select id="quality"><option value="eco">Eco · 15 FPS</option><option value="balanced">Balanced · 30 FPS</option><option value="still">Still · no motion</option></select></label>
+      <label>Rain at <span><output id="rain-output">25</output> MB/s<input id="rain-scale" type="range" min="1" max="100" value="25"></span></label>
+      <label>GPU<select id="gpu-device"><option value="0">GPU 1 · awaiting readings</option></select></label>
+      <label class="check"><input id="show-metrics" type="checkbox" checked> Show readings in screen mode</label>
+      <p id="source-note">Live mode needs the local Node.js companion. The browser alone cannot read hardware sensors.</p>
+      <p class="small">Usage changes the scenery. Temperature readings are separate; the scene is not a thermal alarm.</p>
+    </aside>
+    <button id="restore-ui" hidden aria-label="Exit screen mode">Exit screen mode</button>
+  </main>
+  <script type="module" src="app.js"></script>
+</body>
+</html>
