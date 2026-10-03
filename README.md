@@ -2,25 +2,27 @@
 
 **Turn your PC sensor screen into a living miniature world.**
 
-A quiet Mediterranean village that responds to CPU, GPU, memory, network and disk activity. Built for the small screen inside your case, the extra display on your desk, or a browser tab you leave open.
+A lively circular Romanian village that responds to CPU, GPU, memory, network and disk activity. Built for the small screen inside your case, the extra display on your desk, or a browser tab you leave open.
 
 ![Desktop Weather — illustrated village with animated telemetry](docs/preview.png)
 
 [Try the browser demo](https://samoxis.github.io/desktop-weather/?demo=idle) · [Telemetry explained](docs/telemetry.md) · [Research & decisions](docs/research.md) · [Contribute a scene](CONTRIBUTING.md)
 
-> **v0.1 is an early, working prototype:** an illustrated background with animated layers, not an explorable 3D city. Browser demos use clearly labeled simulated values. Live readings require the local companion.
+> **v0.2 is an early, working prototype:** an illustrated background with animated layers, not an explorable 3D city. Browser demos use clearly labeled simulated values. Live readings require the local companion.
 
 ## What moves?
 
 | Your computer | The little world |
 |---|---|
-| CPU utilization | Windborne seed motes |
-| GPU utilization | Fireflies in the gardens |
-| Memory utilization | Additional window glows |
+| CPU utilization | Tractor speed and dust on the village road |
+| GPU utilization | Wooden windmill rotation |
+| Memory utilization | Hay bales fill the barn courtyard |
 | Download + upload rate | Gentle rain, with a configurable scale |
-| Disk read + write rate | Ripples on the canal |
+| Disk read + write rate | Waterwheel rotation and river ripples |
 
-Morning, golden-hour and moonlight appearances are selectable. Automatic lighting follows your local clock, without location lookup. Usage drives the scene; **it is not a temperature gauge or thermal alarm**. The GPU temperature is shown separately.
+Birds, grazing sheep and wandering chickens add ambient life; these are decorative and do not represent sensors. Tractor and wheel motion stop at zero or unavailable load.
+
+Morning, golden-hour and moonlight appearances are selectable. Day and night use matching cinematic Romanian countryside artwork; the exterior is filled with hills, fields, forest and a stream. Automatic lighting follows your local clock, without location lookup. Usage drives the scene; **it is not a temperature gauge or thermal alarm**. The GPU temperature is shown separately.
 
 ## Run locally
 
@@ -69,7 +71,7 @@ Network defaults to the busiest measured adapter, rather than adding physical an
 
 Any screen recognized as a monitor by the OS can show the browser: HDMI, DisplayPort or a USB graphics display. Layouts were checked at 800×480, 480×800 and 1920×480, as well as regular desktop and small mobile widths. This is browser-layout validation, not a physical screen test.
 
-USB-only smart screens with proprietary protocols and cooler/AIO LCDs are **not supported in v0.1**. They need device-specific adapters. Artwork may crop on very narrow or wide displays; dedicated compositions for those formats are on the roadmap.
+USB-only smart screens with proprietary protocols and cooler/AIO LCDs are **not supported in v0.2**. They need device-specific adapters. The full circular scene stays visible at all aspect ratios; portrait and ultrawide screens use a softened landscape extension around the illustration. Dedicated compositions remain on the roadmap.
 
 ## Local by design
 

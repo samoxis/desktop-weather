@@ -1,4 +1,5 @@
 import { clamp, number, formatPercent, formatRate, demoSnapshot, sceneActivity } from './model.mjs';
+import { createRuralRenderer } from './rural.mjs';
 const $ = id => document.getElementById(id);
 const params = new URLSearchParams(location.search);
 const local = ['localhost', '127.0.0.1'].includes(location.hostname);
@@ -19,8 +20,7 @@ let inScreenMode = params.get('screen') === '1', fetchBusy = false;
 const media = matchMedia('(prefers-reduced-motion: reduce)');
 const scene = $('scene'), canvas = $('weather'), context = canvas.getContext('2d');
 let width = 1, height = 1, lastDraw = 0, frameCount = 0;
-const particles = Array.from({ length: 80 }, (_, i) => ({ x: ((i * 47 + 17) % 101) / 101, y: ((i * 31 + 3) % 97) / 97, phase: i * 1.7 }));
-const windows = [[.232,.311],[.225,.33],[.264,.369],[.266,.397],[.46,.289],[.465,.32],[.498,.363],[.479,.393],[.217,.466],[.218,.493],[.321,.54],[.358,.507],[.408,.515],[.702,.499],[.804,.457],[.824,.431],[.835,.488],[.806,.601],[.776,.584],[.771,.519]];
+const rural = createRuralRenderer(context, scenePoint, () => Math.min(width / 1672, height / 941));
 
 function persist() {
   try { localStorage.setItem('desktop-weather-settings', JSON.stringify({ light: settings.light, quality: settings.quality, rainScale: settings.rainScale, gpuIndex: settings.gpuIndex, showMetrics: settings.showMetrics })); } catch { }
@@ -45,6 +45,8 @@ function applyLight() {
   const hour = new Date().getHours();
   const light = settings.light === 'auto' ? hour >= 7 && hour < 17 ? 'morning' : hour >= 17 && hour < 20 ? 'dusk' : 'night' : settings.light;
   scene.dataset.light = light;
+  const art = light === 'night' ? 'assets/romanian-night.webp' : 'assets/romanian-day.webp';
+  for (const id of ['village', 'landscape-fill']) if ($(id).getAttribute('src') !== art) $(id).src = art;
   $('clock').textContent = new Intl.DateTimeFormat(undefined, { hour: '2-digit', minute: '2-digit' }).format(new Date());
   $('time-label').textContent = { morning: 'Morning light', dusk: 'Golden hour', night: 'Moonlight' }[light];
 }
@@ -76,10 +78,10 @@ function renderReadings() {
   $('source').dataset.state = isDemo ? 'demo' : connection;
   $('source').textContent = isDemo ? 'Demo · simulated' : connection === 'live' ? 'Live · local' : connection === 'connecting' ? 'Connecting' : 'Unavailable';
   $('footer-source').textContent = isDemo ? 'Simulated readings · browser demo' : 'Local telemetry · no account · no cloud';
-  $('scene-status').textContent = isDemo ? 'Illustrated world · simulated telemetry' : connection === 'live' ? 'Connected to this computer · updates every 3s' : 'No live data · scenery resting';
+  $('scene-status').textContent = isDemo ? 'Living village · simulated telemetry' : connection === 'live' ? 'Connected to this computer · updates every 3s' : 'No live data · scenery resting';
   const title = isDemo ? { idle: 'A quiet morning.', game: 'A little more life.', render: 'Busy, but peaceful.', download: 'A passing shower.' }[settings.mode] : connection === 'live' ? 'Your PC, at its own pace.' : 'A small world.\nWaiting for a heartbeat.';
   $('scene-title').textContent = title;
-  $('scene-description').textContent = isDemo ? 'Explore how system activity changes the coast.' : connection === 'live' ? 'Real readings. Gentle changes. Everything stays local.' : 'Start the local companion to see real readings.';
+  $('scene-description').textContent = isDemo ? 'Watch the tractor, mill, barn and river respond.' : connection === 'live' ? 'Real readings. Gentle changes. Everything stays local.' : 'Start the local companion to see real readings.';
   const options = data?.gpu?.devices || [];
   const desired = options.length ? options.map(g => `${g.index}`).join(',') : 'none';
   if ($('gpu-device').dataset.devices !== desired) {
@@ -116,9 +118,8 @@ function resize() {
   lastDraw = 0;
 }
 function scenePoint(x, y) {
-  const imageRatio = 1672 / 941, scale = Math.max(width / 1672, height / 941);
-  const imageWidth = 1672 * scale, imageHeight = imageWidth / imageRatio;
-  return [x * imageWidth + (width - imageWidth) * (width < 480 ? .54 : .5), y * imageHeight + (height - imageHeight) * .5];
+  const scale = Math.min(width / 1672, height / 941);
+  return [x * 1672 * scale + (width - 1672 * scale) / 2, y * 941 * scale + (height - 941 * scale) / 2];
 }
 function draw(now) {
   requestAnimationFrame(draw);
@@ -126,44 +127,10 @@ function draw(now) {
   const still = settings.quality === 'still' || media.matches;
   const interval = still ? 1000 : settings.quality === 'eco' ? 1000 / 15 : 1000 / 30;
   if (now - lastDraw < interval) return;
-  const dt = Math.min(.1, (now - lastDraw) / 1000 || .03); lastDraw = now; frameCount++;
-  for (const key of Object.keys(activity)) activity[key] += (target[key] - activity[key]) * (still ? 1 : .06);
+  const dt = Math.min(.15, (now - lastDraw) / 1000 || .03); lastDraw = now; frameCount++;
+  for (const key of Object.keys(activity)) activity[key] += (target[key] - activity[key]) * (still ? 1 : .12);
   context.clearRect(0, 0, width, height);
-  const night = scene.dataset.light === 'night', time = still ? 0 : now / 1000;
-  // Anchored highlights follow the illustrated windows; they are not new 3D geometry.
-  windows.slice(0, Math.round(activity.glow * windows.length)).forEach(([x, y]) => {
-    const [px, py] = scenePoint(x, y), radius = Math.max(4, width * .009);
-    const gradient = context.createRadialGradient(px, py, 0, px, py, radius);
-    gradient.addColorStop(0, night ? '#ffd69ba0' : '#ffe6b54a'); gradient.addColorStop(1, '#ffd69b00');
-    context.fillStyle = gradient; context.fillRect(px - radius, py - radius, radius * 2, radius * 2);
-  });
-  const fireflies = Math.round(activity.fireflies * 22);
-  for (let i = 0; i < fireflies; i++) {
-    const p = particles[i], [x, y] = scenePoint(.22 + p.x * .64 + Math.sin(time * .25 + p.phase) * .015, .39 + p.y * .28 + Math.cos(time * .4 + p.phase) * .008);
-    context.fillStyle = night ? '#ffdf9fb0' : '#fff3cbad'; context.shadowColor = '#eac187'; context.shadowBlur = night ? 9 : 3;
-    context.beginPath(); context.arc(x, y, 1.5 + Math.sin(time + p.phase) * .4, 0, Math.PI * 2); context.fill();
-  }
-  context.shadowBlur = 0;
-  if (activity.rain > .025) {
-    context.strokeStyle = night ? '#b7d4e258' : '#56879b46'; context.lineWidth = 1;
-    for (let i = 0; i < Math.round(activity.rain * 65); i++) {
-      const p = particles[i]; if (!still) p.y = (p.y + dt * (.14 + activity.rain * .08)) % 1;
-      const x = width * (.52 + p.x * .46), y = p.y * height;
-      context.beginPath(); context.moveTo(x, y); context.lineTo(x - 2 - activity.wind * 3, y + 7); context.stroke();
-    }
-  }
-  for (let i = 0; i < 3 + Math.round(activity.ripples * 12); i++) {
-    const p = particles[i + 30], [x, y] = scenePoint(.6 + p.x * .11, .64 + p.y * .16);
-    const phase = (time * (.2 + activity.ripples * .3) + p.phase) % 1;
-    context.strokeStyle = `rgba(223,239,230,${(1 - phase) * .25})`;
-    context.beginPath(); context.ellipse(x, y, 2 + phase * 12, 1 + phase * 3, 0, 0, Math.PI * 2); context.stroke();
-  }
-  // Soft floating seed motes express CPU-driven wind, never inferred temperature.
-  for (let i = 0; i < Math.round(activity.wind * 16); i++) {
-    const p = particles[i + 55], x = ((p.x + time * (.008 + activity.wind * .012)) % 1) * width;
-    const y = (.2 + p.y * .55 + Math.sin(time + p.phase) * .008) * height;
-    context.fillStyle = '#f7edc780'; context.beginPath(); context.ellipse(x, y, 2.2, 1, -.5, 0, Math.PI * 2); context.fill();
-  }
+  rural.render({activity,dt,time:still ? 0 : now / 1000,still,night:scene.dataset.light === 'night',width,height});
 }
 function toggleSettings() { $('settings').hidden = !$('settings').hidden; $('settings-button').setAttribute('aria-expanded', String(!$('settings').hidden)); }
 async function fullscreen() {
@@ -189,6 +156,6 @@ document.addEventListener('keydown', event => {
 document.addEventListener('visibilitychange', () => { if (!document.hidden) { lastDraw = 0; sample(); } });
 new ResizeObserver(resize).observe(scene);
 media.addEventListener('change', resize);
-window.desktopWeather = { get state() { return { mode: settings.mode, connection, activity: { ...target }, frames: frameCount }; } };
+window.desktopWeather = { get state() { return { mode: settings.mode, connection, activity: { ...target }, frames: frameCount, animation: rural.stats }; } };
 updateSettings(); screenMode(inScreenMode); renderReadings(); sample();
 setInterval(sample, 3000); requestAnimationFrame(draw);

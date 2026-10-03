@@ -6,3 +6,22 @@ body.screen-mode #app{padding:0;max-width:none}body.screen-mode .toolbar,body.sc
 @media(max-width:850px){#app{padding:16px}.toolbar{flex-wrap:wrap}.toolbar-actions{gap:6px;flex-wrap:wrap}.readings{grid-template-columns:repeat(3,minmax(0,1fr))}.reading{padding:14px}.reading:nth-child(4){border-left:0}.reading:nth-child(n+4){border-top:1px solid var(--line)}.keyboard-hint{display:none}.scene-heading{left:18px;top:18px;max-width:220px}.scene-heading p{display:none}.scene-clock{font-size:15px;right:17px;top:19px}body.screen-mode .readings{grid-template-columns:repeat(5,minmax(0,1fr));width:calc(100% - 24px)}body.screen-mode .reading{padding:9px}body.screen-mode .reading:nth-child(n+4){border-top:0;border-left:1px solid var(--line)}body.screen-mode .metric-detail,body.screen-mode .metric-label small{display:none}body.screen-mode .reading strong{font-size:18px}}
 @media(max-width:480px){#app{padding:12px}.toolbar-actions{width:100%;justify-content:space-between}.toolbar-actions button{padding:8px;font-size:11px}.status{font-size:9px;padding:7px 9px}.scene{aspect-ratio:4/5}.scene>img{object-position:53% center}.scene-heading{max-width:200px}h1{font-size:27px}.scene-clock{top:auto;bottom:57px}.scene-note{bottom:14px;left:14px;font-size:10px}.readings{grid-template-columns:repeat(2,minmax(0,1fr))}.reading:nth-child(3),.reading:nth-child(5){border-left:0;border-top:1px solid var(--line)}.reading:nth-child(4){border-left:1px solid var(--line)}.reading:last-child{grid-column:1/-1}.reading strong{font-size:23px}.footer{flex-direction:column;line-height:1.6}.settings{right:12px;top:125px;max-height:calc(100dvh - 140px)}body.screen-mode .readings{grid-template-columns:repeat(3,minmax(0,1fr))}body.screen-mode .reading:nth-child(4){border-left:0}body.screen-mode .reading:nth-child(n+4){border-top:1px solid var(--line)}body.screen-mode .reading:last-child{grid-column:auto}body.screen-mode .scene>img{object-position:54% center}body.screen-mode .settings{top:60px;max-height:calc(100dvh - 80px)}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{transition:none!important}}
+
+/* Preserve the entire telemetry diorama on portrait and ultrawide displays. */
+.scene{background:radial-gradient(ellipse at 50% 50%,#c9def2,#a4c2e0)}
+.scene>img,body.screen-mode .scene>img{object-fit:contain;object-position:center}
+.scene-heading{background:#f7f4e8d6;padding:12px 16px;border-radius:14px;max-width:270px}
+.scene-heading h1{font-size:clamp(20px,2.5vw,34px)}
+.scene[data-light=night] .scene-heading{background:#243948d9}
+.scene[data-light=night]{background:#293e59}
+.metric-label small{font-weight:500}
+@media(max-width:480px){.scene-heading{max-width:215px}.scene-heading h1{font-size:23px}.scene-clock{bottom:57px}}
+
+/* The surrounding landscape fills unusual screen ratios without cropping the village. */
+.scene>#landscape-fill,body.screen-mode .scene>#landscape-fill{object-fit:cover;filter:blur(18px);transform:scale(1.08);opacity:.8;z-index:-1}
+.scene[data-light=night] #village{filter:none}
+.scene[data-light=night] #weather{filter:brightness(.78) saturate(.75)}
+.scene[data-light=night] .light-wash{background:transparent}
+.scene[data-light=night] #landscape-fill{filter:blur(18px)}
+.scene-clock{background:#f7f4e8d6;padding:8px 12px;border-radius:12px}
+.scene[data-light=night] .scene-clock{background:#243948d9}
