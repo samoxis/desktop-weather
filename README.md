@@ -8,6 +8,8 @@ A lively circular Romanian village that responds to CPU, GPU, memory, network an
 
 [Try the browser demo](https://samoxis.github.io/desktop-weather/?demo=idle) · [Telemetry explained](docs/telemetry.md) · [Research & decisions](docs/research.md) · [Contribute a scene](CONTRIBUTING.md)
 
+The replacement's [approved photographic direction](docs/approved-direction.md) can be viewed [inside the app](https://samoxis.github.io/desktop-weather/?view=art-review&demo=render). This view is explicitly static; sensor readings still work, but reference-image machinery does not move. The current procedural 3D appearance below is an intermediate version and does not meet that accepted visual target.
+
 > **v0.4 replaces the illustrated prototype with a real WebGL 3D scene.** Buildings, machinery and animals are procedural meshes with textured materials and shadows. This remains an early prototype, not a photorealistic game. Browser demos use clearly labeled simulated values; live readings require the local companion.
 
 ## What moves?

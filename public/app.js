@@ -1,7 +1,7 @@
 import { clamp, number, formatPercent, formatRate, demoSnapshot, sceneActivity } from './model.mjs';
-import { createWorldRenderer } from './world.mjs';
 const $ = id => document.getElementById(id);
 const params = new URLSearchParams(location.search);
+const artReview = params.get('view') === 'art-review';
 const local = ['localhost', '127.0.0.1'].includes(location.hostname);
 let saved = {};
 try { saved = JSON.parse(localStorage.getItem('desktop-weather-settings') || '{}'); } catch { }
@@ -22,16 +22,22 @@ const scene = $('scene'), canvas = $('weather');
 let width = 1, height = 1, lastDraw = 0, frameCount = 0;
 let rural;
 try {
-  rural = await createWorldRenderer(canvas);
+  rural = artReview
+    ? await (await import('./art-review.mjs')).createArtReview(canvas)
+    : await (await import('./world.mjs')).createWorldRenderer(canvas);
 } catch (error) {
-  $('scene-title').textContent = 'The 3D scene could not start.';
-  $('scene-description').textContent = 'Use a browser with WebGL 2 and hardware acceleration. If assets failed to load, reload the page.';
+  $('scene-title').textContent = 'The scene could not start.';
+  $('scene-description').textContent = artReview ? 'The reference image could not load. Reload the page.' : 'Use a browser with WebGL 2 and hardware acceleration. If assets failed to load, reload the page.';
   $('source').textContent = 'Scene unavailable';
   $('scene-status').textContent = 'Rendering unavailable';
   console.error('3D scene initialization failed', error);
   throw error;
 }
-scene.dataset.engine = '3d';
+scene.dataset.engine = artReview ? 'art-review' : '3d';
+if (artReview) {
+  settings.light = 'morning';
+  $('light').disabled = true; $('quality').disabled = true;
+}
 
 function persist() {
   try { localStorage.setItem('desktop-weather-settings', JSON.stringify({ motionRevision: 4, light: settings.light, quality: settings.quality, rainScale: settings.rainScale, gpuIndex: settings.gpuIndex, showMetrics: settings.showMetrics })); } catch { }
@@ -91,6 +97,11 @@ function renderReadings() {
   const title = isDemo ? { idle: 'A quiet morning.', game: 'A little more life.', render: 'Busy, but peaceful.', download: 'A passing shower.' }[settings.mode] : connection === 'live' ? 'Your PC, at its own pace.' : 'A small world.\nWaiting for a heartbeat.';
   $('scene-title').textContent = title;
   $('scene-description').textContent = isDemo ? 'Watch the tractor, mill, barn and river respond.' : connection === 'live' ? 'Real readings. Gentle changes. Everything stays local.' : 'Start the local companion to see real readings.';
+  if (artReview) {
+    $('scene-title').textContent = 'The approved countryside.';
+    $('scene-description').textContent = 'Art review · static image. Animation is not implemented in this view.';
+    $('scene-status').textContent = 'Approved visual reference · static';
+  }
   const options = data?.gpu?.devices || [];
   const desired = options.length ? options.map(g => `${g.index}`).join(',') : 'none';
   if ($('gpu-device').dataset.devices !== desired) {
@@ -127,7 +138,7 @@ function resize() {
 function draw(now) {
   requestAnimationFrame(draw);
   if (document.hidden) return;
-  const still = settings.quality === 'still' || media.matches;
+  const still = artReview || settings.quality === 'still' || media.matches;
   const interval = still ? 1000 : settings.quality === 'smooth' ? 1000 / 60 : 1000 / 30;
   if (now - lastDraw < interval - 1) return;
   const dt = Math.min(.15, (now - lastDraw) / 1000 || .03); lastDraw = now; frameCount++;

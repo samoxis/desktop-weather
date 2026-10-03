@@ -16,3 +16,7 @@ Earlier collector checks verified live Windows CPU/RAM, network/disk counter del
 The scene contains procedural 3D models with generated surface textures. It is a diorama prototype, not photorealistic art, a vehicle dynamics simulator or a fluid simulation. Mechanical tests do not establish that the artwork meets a particular aesthetic standard.
 
 Not physically tested: internal/USB displays, AMD/Intel GPUs, multiple NVIDIA GPUs, other operating systems, thermal adapters, native packaging or Windows auto-start. Resource budgets and sustained frame times on low-power hardware remain unmeasured. CI on Windows/Linux tests code rather than hardware compatibility.
+
+## Approved photographic reference view
+
+The owner approved the photographic reference on 2026-10-03. Its in-app art-review mode was checked in Microsoft Edge: the actual image was drawn and visually inspected, simulated CPU/GPU readings appeared, source switching and screen-mode recovery worked, and the four compact/portrait/ultrawide layouts above had no horizontal overflow. The view did not request Three.js or the procedural world module. The PNG hash matches the approved original exactly. It is explicitly static; this check makes no claim about photographic animation.

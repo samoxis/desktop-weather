@@ -1,5 +1,7 @@
 # Romanian countryside scene — v0.4
 
+**The procedural v0.4 appearance was rejected by the owner.** The accepted target is now the [photographic reference](approved-direction.md), approved on 2026-10-03. Its materials, proportions, lighting and composition are the visual baseline for the replacement. The descriptions below document the current renderer rather than the accepted final appearance.
+
 A circular Romanian village on a raised stone terrace, surrounded by continuous countryside. Actual WebGL geometry replaces the earlier illustrated scene and sprite overlays. The camera is fixed; this is a procedural 3D diorama, not an explorable or photorealistic game.
 
 ## Current production assets
