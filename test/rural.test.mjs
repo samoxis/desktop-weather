@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import { createRuralRenderer } from '../public/rural.mjs';
 import { sceneActivity, demoSnapshot } from '../public/model.mjs';
 import { drawTractor } from '../public/tractor.mjs';
+import {createTractorMotion,roadLength} from '../public/motion.mjs';
 
 // Exercise the actual render loop with a no-op drawing surface.
 function renderer(){
@@ -38,5 +39,30 @@ test('Tractor waits for a decoded sprite and draws it with the night lighting',(
   assert.equal(drawTractor(context,null,frame),false);
   assert.equal(draws,0);
   assert.equal(drawTractor(context,{complete:true,naturalWidth:1536},frame),true);
-  assert.equal(draws,1);assert.match(appliedFilter,/brightness/);
+  assert.equal(draws,4);assert.match(appliedFilter,/brightness/);
+});
+test('Tractor accelerates, spins tires by distance and stops before changing direction',()=>{
+  const motion=createTractorMotion();
+  const start=motion.step(0,1,false),first=motion.step(.1,1,false),second=motion.step(.1,1,false);
+  assert.ok(first.speed>0 && second.speed>first.speed);
+  assert.ok(first.speed<58);
+  assert.ok(Math.abs((second.tireAngle-start.tireAngle)-(second.distance-start.distance)/14)<1e-9);
+  let previous=second,turned=false;
+  for(let i=0;i<1000;i++){
+    const next=motion.step(.1,1,false);
+    assert.ok(next.distance>=0 && next.distance<=roadLength);
+    if(next.direction!==previous.direction){assert.equal(previous.speed,0);assert.equal(next.speed,0);turned=true;break;}
+    previous=next;
+  }
+  assert.equal(turned,true);
+  const stopped=motion.step(.1,0,false),rest=motion.step(.1,0,false);
+  assert.equal(stopped.distance,rest.distance);assert.equal(stopped.tireAngle,rest.tireAngle);
+});
+test('River and wheel share one phase, including when animation is frozen',()=>{
+  const world=renderer(),activity=sceneActivity(demoSnapshot('render'));
+  world.render({activity,dt:.1,time:1,still:false,night:false,width:1672,height:941});
+  const before=world.stats;
+  assert.ok(before.waterPhase>0);assert.equal(before.waterPhase,before.wheelAngle);
+  world.render({activity,dt:.1,time:100,still:true,night:false,width:1672,height:941});
+  assert.equal(world.stats.waterPhase,before.waterPhase);assert.equal(world.stats.tireAngle,before.tireAngle);
 });

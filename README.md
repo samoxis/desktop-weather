@@ -14,13 +14,15 @@ A lively circular Romanian village that responds to CPU, GPU, memory, network an
 
 | Your computer | The little world |
 |---|---|
-| CPU utilization | Tractor speed and dust on the village road |
+| CPU utilization | Tractor speed, acceleration, wheel-face rotation and dust on the village road |
 | GPU utilization | Wooden windmill rotation |
 | Memory utilization | Hay bales fill the barn courtyard |
 | Download + upload rate | Gentle rain, with a configurable scale |
-| Disk read + write rate | Waterwheel rotation and river ripples |
+| Disk read + write rate | Wooden waterwheel rotation synchronized with flowing river texture and foam |
 
 Birds, grazing sheep and wandering chickens add ambient life; these are decorative and do not represent sensors. Tractor and wheel motion stop at zero or unavailable load.
+
+The tractor follows a smooth road curve and brakes before changing direction. The river animation is mapped to the visible water channels, leaving bridges and banks intact. Both are layered 2D effects, not a physical vehicle or fluid simulation.
 
 Morning, golden-hour and moonlight appearances are selectable. Day and night use matching cinematic Romanian countryside artwork; the exterior is filled with hills, fields, forest and a stream. Automatic lighting follows your local clock, without location lookup. Usage drives the scene; **it is not a temperature gauge or thermal alarm**. The GPU temperature is shown separately.
 

@@ -3,7 +3,7 @@
 Local validation on Windows, 2026-10-03:
 
 - JavaScript syntax checks passed.
-- All 13 Node.js tests passed: core telemetry/security checks plus renderer motion, still mode, missing-data behavior and tractor sprite loading/night shading.
+- All 15 Node.js tests passed: core telemetry/security checks plus renderer motion, still mode, missing-data behavior, sprite loading/night shading, acceleration and stopping before reversal, distance-based wheel rotation and synchronized water/wheel phase.
 - Live CPU and memory readings verified through the local HTTP endpoint and browser.
 - Live Windows network/disk counter deltas verified; these were not forced with a benchmark or stress test.
 - Existing NVIDIA driver queried successfully for utilization, temperature, used/total VRAM, power and fan percentage. No driver or HWiNFO configuration changes.
@@ -11,7 +11,7 @@ Local validation on Windows, 2026-10-03:
 - Demo source switching, lighting, screen-mode keyboard recovery and GPU-driven scene state verified.
 - Eco mode drew 31 frames during a 2.1-second observation, consistent with the 15 FPS cap. This is a frame-count check, not a full GPU/CPU/memory benchmark.
 - Simulated collector HTTP failure changed the source to unavailable and cleared the readings; no silent demo fallback.
-- Browser checks verified the realistic tractor sprite loaded, tractor/windmill/waterwheel movement, the separate night artwork, and frozen machinery in Still mode. No unhandled browser script errors.
+- Browser checks verified both realistic tractor and waterwheel sprites loaded, tractor wheel-face rotation and synchronized river/waterwheel phase, the separate night artwork, and frozen machinery/river in Still mode. No unhandled browser script errors.
 
 The README image and night preview are screenshots of the actual browser prototype using labeled simulated readings. Day/night backgrounds are AI-generated raster artwork with procedural Canvas animation overlays; this is not a live 3D game. The full village remains visible while a softened landscape extension fills unusual screen ratios.
 

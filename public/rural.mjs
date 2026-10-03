@@ -1,12 +1,12 @@
 import { clamp } from './model.mjs';
 import { drawTractor } from './tractor.mjs';
+import { createTractorMotion, roadPosition, roadLength, ROAD } from './motion.mjs';
+import { drawRiver, drawWaterwheel } from './river.mjs';
 
 // Coordinates refer to the Romanian scene, not to the browser viewport.
-export const ROAD = [[.273,.546],[.30,.596],[.36,.636],[.44,.678],[.53,.709],[.596,.713]];
+export { ROAD };
 export function routePoint(progress) {
-  const position = clamp(progress) * (ROAD.length - 1), index = Math.min(ROAD.length - 2, Math.floor(position)), t = position - index;
-  const a = ROAD[index], b = ROAD[index + 1];
-  return [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t];
+  return roadPosition(clamp(progress)*roadLength).point;
 }
 export function ruralRates(activity) {
   return {
@@ -54,15 +54,18 @@ function chicken(ctx,x,y,scale,time){
   ellipse(ctx,0,-3,5,4,'#f8ebcc');ellipse(ctx,4,-6,3,3,'#fff2d7');ellipse(ctx,4,-9,2,1.4,'#c45646');line(ctx,[[6,-6],[9,-5]],'#d6a143',1.8);line(ctx,[[-3,-4],[-7,-7]],'#8b754a',2);ctx.restore();
 }
 
-export function createRuralRenderer(ctx, point, sceneScale, tractorImage = null) {
-  let tractorProgress=.26,millAngle=0,wheelAngle=0,lastStats={};
+export function createRuralRenderer(ctx, point, sceneScale, tractorImage = null, waterwheelImage = null, waterImage = null) {
+  const motion=createTractorMotion();
+  let millAngle=0,wheelAngle=0,lastStats={};
   const motes=Array.from({length:150},(_,i)=>({x:((i*47+17)%149)/149,y:((i*31+3)%137)/137,phase:i*1.7}));
   return {
     get stats(){return {...lastStats};},
     render({ activity, dt, time, still, night, width, height }) {
       const rates=ruralRates(activity),s=sceneScale();
-      if(!still){tractorProgress=(tractorProgress+dt*rates.tractor)%2;millAngle+=dt*rates.mill;wheelAngle+=dt*rates.wheel;}
-      lastStats={tractorProgress,millAngle,wheelAngle,hayBales:rates.hay,rainDrops:rates.rain,tractorLoaded:Boolean(tractorImage?.complete && tractorImage.naturalWidth)};
+      const vehicle=motion.step(dt,activity.wind,still);
+      if(!still){millAngle+=dt*rates.mill;wheelAngle+=dt*rates.wheel;}
+      lastStats={tractorProgress:vehicle.distance/roadLength,tractorSpeed:vehicle.speed,tractorDirection:vehicle.direction,tireAngle:vehicle.tireAngle,millAngle,wheelAngle,waterPhase:wheelAngle,hayBales:rates.hay,rainDrops:rates.rain,tractorLoaded:Boolean(tractorImage?.complete && tractorImage.naturalWidth),waterwheelLoaded:Boolean(waterwheelImage?.complete && waterwheelImage.naturalWidth)};
+      drawRiver(ctx,point,s,wheelAngle,night,waterImage);
       // Ambient birds and grazing animals are decorative; meters describe the telemetry mapping.
       for(let i=0;i<4;i++){const p=motes[i],x=((p.x+time*.007)%1)*width,y=(.1+p.y*.12+Math.sin(time+i)*.003)*height;line(ctx,[[x-5,y],[x,y+Math.sin(time*4+i)*2],[x+5,y]],night?'#cbd7d075':'#47594b90',1.5);}
       for(let i=0;i<6;i++){const [x,y]=point(.64+(i%3)*.02+Math.sin(time*.32+i)*.006,.36+Math.floor(i/3)*.017);sheep(ctx,x,y,s*.8,time,i);}
@@ -70,11 +73,11 @@ export function createRuralRenderer(ctx, point, sceneScale, tractorImage = null)
       // GPU: an unmistakable large wooden rotor anchored on the mill facade.
       {const [x,y]=point(.724,.287);rotor(ctx,x,y,s*1.02,millAngle);}
       // Disk: a riverside waterwheel. Its rate follows I/O, not network traffic.
-      {const [x,y]=point(.720,.658);rotor(ctx,x,y,s*.9,wheelAngle,true);}
+      drawWaterwheel(ctx,waterwheelImage,point,s,wheelAngle,night);
       // RAM: fill the visible courtyard with neatly stacked bales, not barely visible glows.
       for(let i=0;i<rates.hay;i++){const col=i%6,row=Math.floor(i/6),[x,y]=point(.506+col*.014,.457-row*.012);hayBale(ctx,x,y,s);}
       // Road vehicle speed and dust visibly follow CPU load; stops at zero/unavailable.
-      {const reverse=tractorProgress>1,[rx,ry]=routePoint(reverse ? 2-tractorProgress : tractorProgress),[x,y]=point(rx,ry);drawTractor(ctx,tractorImage,{x,y,scale:s*(.82+ry*.28),phase:tractorProgress,load:activity.wind,reverse,night,moving:!still && rates.tractor>0});}
+      {const [rx,ry]=vehicle.point,[x,y]=point(rx,ry);drawTractor(ctx,tractorImage,{x,y,scale:s*(.82+ry*.28),phase:vehicle.tireAngle,load:activity.wind,reverse:vehicle.direction<0,night,moving:!still && vehicle.speed>.1,heading:vehicle.heading,tireAngle:vehicle.tireAngle});}
       // Upload and download are combined for the rain scale, with an intentionally gentle ceiling.
       if(rates.rain){
         const [cloudX,cloudY]=point(.87,.10);
@@ -83,8 +86,6 @@ export function createRuralRenderer(ctx, point, sceneScale, tractorImage = null)
         ellipse(ctx,cloudX,cloudY,width*.16,height*.06,mist);
         for(let i=0;i<rates.rain;i++){const p=motes[i];if(!still)p.y=(p.y+dt*(.25+activity.rain*.18))%1;const [x,y]=point(.76+p.x*.19,.13+p.y*.63);line(ctx,[[x,y],[x-3,y+9]],night?'#c2dfe580':'#527f9d6b',1.3);}
       }
-      // Read/write ripples provide a second, smaller indicator beside the wheel.
-      for(let i=0;i<Math.round(activity.ripples*15);i++){const p=motes[i+30],[x,y]=point(.74+p.x*.035,.72+p.y*.17),phase=(time*.5+p.phase)%1;ctx.strokeStyle=`rgba(226,244,247,${(1-phase)*.6})`;ctx.lineWidth=1;ctx.beginPath();ctx.ellipse(x,y,2+phase*10,1+phase*3,0,0,Math.PI*2);ctx.stroke();}
       // Dusk fireflies, slow at rest: decorative, not the primary GPU indicator.
       if(night)for(let i=0;i<12;i++){const p=motes[i+70],[x,y]=point(.1+p.x*.7,.45+p.y*.3+Math.sin(time+p.phase)*.009);ellipse(ctx,x,y,1.8,1.8,'#ffdd9a9c');}
     }

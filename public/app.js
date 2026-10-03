@@ -22,7 +22,9 @@ const scene = $('scene'), canvas = $('weather'), context = canvas.getContext('2d
 let width = 1, height = 1, lastDraw = 0, frameCount = 0;
 const tractorImage = new Image();
 tractorImage.src = new URL('./assets/tractor-real.webp', import.meta.url).href;
-const rural = createRuralRenderer(context, scenePoint, () => Math.min(width / 1672, height / 941), tractorImage);
+const waterwheelImage = new Image();
+waterwheelImage.src = new URL('./assets/waterwheel-real.webp', import.meta.url).href;
+const rural = createRuralRenderer(context, scenePoint, () => Math.min(width / 1672, height / 941), tractorImage, waterwheelImage, $('village'));
 
 function persist() {
   try { localStorage.setItem('desktop-weather-settings', JSON.stringify({ light: settings.light, quality: settings.quality, rainScale: settings.rainScale, gpuIndex: settings.gpuIndex, showMetrics: settings.showMetrics })); } catch { }
