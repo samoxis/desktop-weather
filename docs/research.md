@@ -4,7 +4,7 @@ Research date: 2026-10-03. These references establish implementation direction; 
 
 ## Related projects
 
-- [Metropolis](https://github.com/5c0/metropolis): a terminal city driven by system activity. Evidence that the general metaphor already exists. Desktop Weather differentiates through a calm illustrated scene, a browser renderer and sensor-screen layouts; we do not claim to invent visual system monitoring.
+- [Metropolis](https://github.com/5c0/metropolis): a terminal city driven by system activity. Evidence that the general metaphor already exists. Desktop Weather differentiates through a rural 3D scene, a browser renderer and sensor-screen layouts; we do not claim to invent visual system monitoring.
 - [Turing Smart Screen Python](https://github.com/mathoudebine/turing-smart-screen-python): supports specific USB screen protocols and community themes. Useful research for future display adapters; a browser app alone cannot speak every USB LCD protocol.
 - [InfoPanel](https://github.com/habibrehmansg/infopanel): sensor visualization using HWiNFO and external displays. Useful reference for expectations around sensor source availability. No code was copied.
 - [AIDA64 external display support](https://www.aida64.com/products/features/external-display-support): distinguishes device-specific LCD support from Windows desktop panels. Our first target is a screen that Windows already recognizes as a monitor.
@@ -29,4 +29,14 @@ Research date: 2026-10-03. These references establish implementation direction; 
 
 ## Deliberate limits
 
-The scene is layered illustration, not realtime 3D. One shared background is cropped by display shape; dedicated format-specific scenes would improve readability. GPU hardware validation covered NVIDIA only. No USB smart-screen protocol, AIO display integration, CPU thermal alarm, native `.exe`, auto-start or custom sensor mapping is claimed. Those are separate work items requiring hardware-backed testing.
+The scene is now realtime 3D, with procedural models and a fixed camera. Dedicated format-specific compositions would improve readability. GPU hardware validation covered NVIDIA only. No USB smart-screen protocol, AIO display integration, CPU thermal alarm, native `.exe`, auto-start or custom sensor mapping is claimed. Those are separate work items requiring hardware-backed testing.
+
+## v0.4 renderer research
+
+The 2D overlays could not turn the vehicle or rotate its complete tires consistently. The replacement uses actual geometry, pivot groups, shadows, instancing and local texture maps. It trades a richer picture for additional GPU work, which still needs resource-budget measurement on small PCs.
+
+- [Three.js WebGLRenderer](https://threejs.org/docs/pages/WebGLRenderer.html): browser renderer, output color/tone mapping and shadows.
+- [Three.js Water](https://threejs.org/docs/pages/Water.html): reference for a shader-based surface. This project implements its own stream shader rather than the Water addon or a fluid simulator.
+- [Three.js MIT license](https://threejs.org/license/): redistribution terms for the locally bundled 0.186.1 renderer and utility.
+
+The vehicle follows road position/tangent and rolls tires from travel distance. The mill uses a real shared shaft. Rain now has 3D drops and impact rings; roof collisions remain approximate. These changes improve structural motion consistency but do not prove artistic quality or photorealism.

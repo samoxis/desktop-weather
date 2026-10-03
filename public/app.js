@@ -1,5 +1,5 @@
 import { clamp, number, formatPercent, formatRate, demoSnapshot, sceneActivity } from './model.mjs';
-import { createRuralRenderer } from './rural.mjs';
+import { createWorldRenderer } from './world.mjs';
 const $ = id => document.getElementById(id);
 const params = new URLSearchParams(location.search);
 const local = ['localhost', '127.0.0.1'].includes(location.hostname);
@@ -7,7 +7,7 @@ let saved = {};
 try { saved = JSON.parse(localStorage.getItem('desktop-weather-settings') || '{}'); } catch { }
 const settings = {
   mode: params.get('demo') || (local ? 'live' : 'idle'),
-  light: saved.light || 'morning', quality: saved.quality === 'still' ? 'still' : saved.motionRevision === 3 ? saved.quality || 'smooth' : 'smooth',
+  light: saved.light || 'morning', quality: saved.quality === 'still' ? 'still' : saved.motionRevision === 4 ? saved.quality || 'smooth' : 'smooth',
   rainScale: Number(saved.rainScale) || 25, gpuIndex: Number(saved.gpuIndex) || 0,
   showMetrics: saved.showMetrics !== false
 };
@@ -18,19 +18,23 @@ settings.rainScale = clamp(settings.rainScale, 1, 100);
 let data = null, connection = 'connecting', lastReceived = 0, activity = sceneActivity(null), target = activity;
 let inScreenMode = params.get('screen') === '1', fetchBusy = false;
 const media = matchMedia('(prefers-reduced-motion: reduce)');
-const scene = $('scene'), canvas = $('weather'), context = canvas.getContext('2d');
+const scene = $('scene'), canvas = $('weather');
 let width = 1, height = 1, lastDraw = 0, frameCount = 0;
-const tractorImage = new Image();
-tractorImage.src = new URL('./assets/tractor-real.webp', import.meta.url).href;
-const waterwheelImage = new Image();
-waterwheelImage.src = new URL('./assets/waterwheel-real.webp', import.meta.url).href;
-const hensImage = new Image(), farmImage = new Image();
-hensImage.src = new URL('./assets/hens-real.webp', import.meta.url).href;
-farmImage.src = new URL('./assets/farm-real.webp', import.meta.url).href;
-const rural = createRuralRenderer(context, scenePoint, () => Math.min(width / 1672, height / 941), tractorImage, waterwheelImage, $('village'), hensImage, farmImage);
+let rural;
+try {
+  rural = await createWorldRenderer(canvas);
+} catch (error) {
+  $('scene-title').textContent = 'The 3D scene could not start.';
+  $('scene-description').textContent = 'Use a browser with WebGL 2 and hardware acceleration. If assets failed to load, reload the page.';
+  $('source').textContent = 'Scene unavailable';
+  $('scene-status').textContent = 'Rendering unavailable';
+  console.error('3D scene initialization failed', error);
+  throw error;
+}
+scene.dataset.engine = '3d';
 
 function persist() {
-  try { localStorage.setItem('desktop-weather-settings', JSON.stringify({ motionRevision: 3, light: settings.light, quality: settings.quality, rainScale: settings.rainScale, gpuIndex: settings.gpuIndex, showMetrics: settings.showMetrics })); } catch { }
+  try { localStorage.setItem('desktop-weather-settings', JSON.stringify({ motionRevision: 4, light: settings.light, quality: settings.quality, rainScale: settings.rainScale, gpuIndex: settings.gpuIndex, showMetrics: settings.showMetrics })); } catch { }
 }
 function updateSettings() {
   $('mode').value = settings.mode; $('light').value = settings.light;
@@ -52,8 +56,6 @@ function applyLight() {
   const hour = new Date().getHours();
   const light = settings.light === 'auto' ? hour >= 7 && hour < 17 ? 'morning' : hour >= 17 && hour < 20 ? 'dusk' : 'night' : settings.light;
   scene.dataset.light = light;
-  const art = light === 'night' ? 'assets/romanian-night.webp' : 'assets/romanian-day.webp';
-  for (const id of ['village', 'landscape-fill']) if ($(id).getAttribute('src') !== art) $(id).src = art;
   $('clock').textContent = new Intl.DateTimeFormat(undefined, { hour: '2-digit', minute: '2-digit' }).format(new Date());
   $('time-label').textContent = { morning: 'Morning light', dusk: 'Golden hour', night: 'Moonlight' }[light];
 }
@@ -119,14 +121,8 @@ async function sample() {
 }
 function resize() {
   const rect = scene.getBoundingClientRect(); width = rect.width; height = rect.height;
-  const ratio = Math.min(devicePixelRatio || 1, settings.quality === 'eco' ? 1.25 : 2);
-  canvas.width = Math.round(width * ratio); canvas.height = Math.round(height * ratio);
-  context.setTransform(ratio, 0, 0, ratio, 0, 0);
+  rural.resize(width,height,settings.quality);
   lastDraw = 0;
-}
-function scenePoint(x, y) {
-  const scale = Math.min(width / 1672, height / 941);
-  return [x * 1672 * scale + (width - 1672 * scale) / 2, y * 941 * scale + (height - 941 * scale) / 2];
 }
 function draw(now) {
   requestAnimationFrame(draw);
@@ -136,8 +132,8 @@ function draw(now) {
   if (now - lastDraw < interval - 1) return;
   const dt = Math.min(.15, (now - lastDraw) / 1000 || .03); lastDraw = now; frameCount++;
   for (const key of Object.keys(activity)) activity[key] += (target[key] - activity[key]) * (still ? 1 : 1-Math.exp(-dt*2.8));
-  context.clearRect(0, 0, width, height);
-  rural.render({activity,dt,time:still ? 0 : now / 1000,still,night:scene.dataset.light === 'night',width,height});
+
+  rural.render({activity,dt,time:still ? 0 : now / 1000,still,night:scene.dataset.light === 'night',dusk:scene.dataset.light === 'dusk',width,height,quality:settings.quality});
 }
 function toggleSettings() { $('settings').hidden = !$('settings').hidden; $('settings-button').setAttribute('aria-expanded', String(!$('settings').hidden)); }
 async function fullscreen() {
@@ -166,4 +162,3 @@ media.addEventListener('change', resize);
 window.desktopWeather = { get state() { return { mode: settings.mode, connection, activity: { ...target }, frames: frameCount, animation: rural.stats }; } };
 updateSettings(); screenMode(inScreenMode); renderReadings(); sample();
 setInterval(sample, 3000); requestAnimationFrame(draw);
-

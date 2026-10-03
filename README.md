@@ -4,31 +4,31 @@
 
 A lively circular Romanian village that responds to CPU, GPU, memory, network and disk activity. Built for the small screen inside your case, the extra display on your desk, or a browser tab you leave open.
 
-![Desktop Weather — illustrated village with animated telemetry](docs/preview.png)
+![Desktop Weather — live 3D village with simulated telemetry](docs/preview-3d.png)
 
 [Try the browser demo](https://samoxis.github.io/desktop-weather/?demo=idle) · [Telemetry explained](docs/telemetry.md) · [Research & decisions](docs/research.md) · [Contribute a scene](CONTRIBUTING.md)
 
-> **v0.3 is an early, working prototype:** an illustrated background with animated layers, not an explorable 3D city. Browser demos use clearly labeled simulated values. Live readings require the local companion.
+> **v0.4 replaces the illustrated prototype with a real WebGL 3D scene.** Buildings, machinery and animals are procedural meshes with textured materials and shadows. This remains an early prototype, not a photorealistic game. Browser demos use clearly labeled simulated values; live readings require the local companion.
 
 ## What moves?
 
 | Your computer | The little world |
 |---|---|
-| CPU utilization | Tractor speed, acceleration, wheel-face rotation and dust on the village road |
+| CPU utilization | Tractor speed, acceleration, four rotating tires and steering on a continuous village road |
 | GPU utilization | Wooden windmill rotation |
 | Memory utilization | Hay bales fill the barn courtyard |
-| Download + upload rate | Gentle rain, with a configurable scale |
-| Disk read + write rate | Wooden waterwheel rotation synchronized with flowing river texture and foam |
+| Download + upload rate | 3D rain droplets, ground/roof impacts, river ripples and wetter materials, with a configurable scale |
+| Disk read + write rate | A wooden waterwheel on a fixed 3D axle, synchronized with flowing river shading and foam |
 
-Birds, grazing sheep and wandering chickens add ambient life; these are decorative and do not represent sensors. Tractor and wheel motion stop at zero or unavailable load.
+Birds with hinged wings, sheep and articulated chickens add ambient life; these are decorative and do not represent sensors. Tractor and mill motion stop at zero or unavailable load.
 
-The tractor follows a smooth road curve and brakes before slowly reversing, keeping the same cab orientation. The river animation is mapped to the visible water channels, leaving bridges and banks intact. Both are layered 2D effects, not a physical vehicle or fluid simulation.
+The tractor follows a closed road loop, turns with the road tangent and steers its front wheels. Tire rotation uses traveled distance divided by each tire's radius; tread, rims and hubs rotate together. Bridges connect both river crossings. The wheel's rims, spokes and paddles rotate around one shared shaft. River shading and machinery share an animation phase; this is an artistic telemetry mapping rather than a fluid or vehicle physics simulation.
 
-Morning, golden-hour and moonlight appearances are selectable. Day and night use matching cinematic Romanian countryside artwork; the exterior is filled with hills, fields, forest and a stream. Automatic lighting follows your local clock, without location lookup. Usage drives the scene; **it is not a temperature gauge or thermal alarm**. The GPU temperature is shown separately.
+Morning, golden-hour and moonlight appearances are selectable. Day and night change lighting in the same 3D world, with warm windows at night. Hills, trees, fields and a stream fill the surroundings. Automatic lighting follows your local clock, without location lookup. Usage drives the scene; **it is not a temperature gauge or thermal alarm**. The GPU temperature is shown separately.
 
 ## Run locally
 
-Requires **Node.js 22 or newer**. No npm packages, account, API key or administrator permission needed.
+Requires **Node.js 22 or newer**, plus a browser with **WebGL 2 and hardware acceleration**. No npm installation, account, API key or administrator permission needed. Three.js is bundled locally.
 
 ```sh
 git clone https://github.com/samoxis/desktop-weather.git
@@ -73,7 +73,9 @@ Network defaults to the busiest measured adapter, rather than adding physical an
 
 Any screen recognized as a monitor by the OS can show the browser: HDMI, DisplayPort or a USB graphics display. Layouts were checked at 800×480, 480×800 and 1920×480, as well as regular desktop and small mobile widths. This is browser-layout validation, not a physical screen test.
 
-USB-only smart screens with proprietary protocols and cooler/AIO LCDs are **not supported in v0.3**. They need device-specific adapters. The full circular scene stays visible at all aspect ratios; portrait and ultrawide screens use a softened landscape extension around the illustration. Dedicated compositions remain on the roadmap.
+USB-only smart screens with proprietary protocols and cooler/AIO LCDs are **not supported in v0.4**. They need device-specific adapters. The camera adjusts to keep the circular scene visible in portrait layouts. Dedicated compositions remain on the roadmap.
+
+The 3D renderer consumes GPU resources itself. Smooth caps drawing at 60 FPS; Eco reduces resolution and shadow detail. These are targets, not performance guarantees. Resource budgets on low-power PCs still need measurement.
 
 ## Local by design
 
@@ -88,19 +90,19 @@ node scripts/check.mjs
 node --test
 ```
 
-No dependency installation or build step. `public/` is also the complete static demo. GitHub Actions checks JavaScript and tests on Windows and Linux; a separate Pages workflow publishes the demo.
+No dependency installation or build step. `public/` is also the complete static demo, including pinned Three.js 0.186.1. GitHub Actions checks JavaScript and tests on Windows and Linux; a separate Pages workflow publishes the demo. See [validation](docs/validation.md) for what was actually exercised.
 
 ## Next places to take it
 
-- Purpose-built compact, portrait and ultrawide scenes instead of cropping one illustration.
+- Purpose-built compact, portrait and ultrawide compositions.
 - Read-only LibreHardwareMonitor adapter with explicit sensor mapping and source freshness.
 - AMD/Intel GPU support with hardware-backed validation.
 - Native monitor selection and an optional desktop wrapper.
-- Scene packs with normalized anchors, preview thumbnails and community contributions.
+- Higher-detail art and scene packs with preview thumbnails and community contributions.
 - Measured renderer/collector resource budgets on small PCs.
 - Carefully selected adapters for USB smart screens.
 
 ## Credits & license
 
-Code is MIT licensed. The village background was created for this project using OpenAI image generation; it is AI-generated artwork, not a live 3D render. The included artwork is offered under the same MIT terms. No third-party project code or artwork was copied. Research references and the related projects are listed in [research notes](docs/research.md).
+Project code and included project artwork are offered under MIT terms. Three.js and its BufferGeometryUtils helper are bundled under their own [MIT license](public/vendor/THREE-LICENSE.txt), copyright the Three.js authors. The surface texture atlas was created with OpenAI image generation; the models and animation are code-generated. Earlier raster scene and sprite assets remain in the repository but are not used by v0.4. See [art provenance](docs/art-direction.md) and [research notes](docs/research.md).
 

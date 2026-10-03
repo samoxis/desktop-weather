@@ -1,19 +1,18 @@
-# v0.3 validation
+# v0.4 validation
 
-Local validation on Windows, 2026-10-03:
+Local Windows validation, 2026-10-03. Screenshots come from the running browser using explicitly simulated values.
 
-- JavaScript syntax checks passed.
-- All 16 Node.js tests passed: core telemetry/security checks plus renderer motion, still mode, missing-data behavior, sprite loading/night shading, acceleration and stopping before reversal, distance-based wheel rotation and synchronized water/wheel phase.
-- Live CPU and memory readings verified through the local HTTP endpoint and browser.
-- Live Windows network/disk counter deltas verified; these were not forced with a benchmark or stress test.
-- Existing NVIDIA driver queried successfully for utilization, temperature, used/total VRAM, power and fan percentage. No driver or HWiNFO configuration changes.
-- Headless Microsoft Edge interaction checks passed at 1440×1060, 800×480, 480×800, 1920×480 and 320×640 without horizontal overflow.
-- Demo source switching, lighting, screen-mode keyboard recovery and GPU-driven scene state verified.
-- Smooth mode drew 127 frames during a 2.1-second observation, consistent with the 60 FPS cap. This is a frame-count check, not a full GPU/CPU/memory benchmark.
-- Simulated collector HTTP failure changed the source to unavailable and cleared the readings; no silent demo fallback.
-- Browser checks verified both realistic tractor and waterwheel sprites loaded, tractor wheel-face rotation and synchronized river/waterwheel phase, the separate night artwork, and frozen machinery/river in Still mode. No unhandled browser script errors.
+- JavaScript syntax checks and 21 Node tests passed. Five tests exercise the new 3D driving geometry, independent tire/steering groups, shared waterwheel axle, rain instances/impacts and alternating hen foot contact. The remaining 16 cover telemetry/security and retained legacy 2D modules; those legacy tests do not prove the new scene's visual quality.
+- A headless Microsoft Edge recording followed the tractor for 60 seconds, including a full closed-road lap. Heading and tire rotations changed continuously. About 3,600 rendered frames were counted; this checks local frame pacing, not performance on other hardware.
+- Morning, rain and night screenshots were inspected. Missing roofs, floating exterior rocks, sparse foliage and an overly dark night were corrected during inspection.
+- Rain mode produced 1,100 3D droplet instances with ground/roof impact rings. Tests check their presence and animation, not fluid accuracy.
+- Still froze tractor travel, tire angles, windmill, waterwheel and river phase. Reduced-motion uses the same stopped animation path.
+- 800×480, 480×800, 1920×480 and 320×640 layouts were checked for horizontal overflow and keyboard recovery from screen mode.
+- Live local readings were reached in the browser. Simulated HTTP 503 failure cleared CPU readings to unavailable rather than substituting demo data.
+- No unhandled browser errors or Three.js warnings were observed on the normal local path.
 
-The README image and night preview are screenshots of the actual browser prototype using labeled simulated readings. Day/night backgrounds are AI-generated raster artwork with procedural Canvas animation overlays; this is not a live 3D game. The full village remains visible while a softened landscape extension fills unusual screen ratios.
+Earlier collector checks verified live Windows CPU/RAM, network/disk counter deltas and queries to an existing NVIDIA driver for load, temperature, VRAM, power and fan percentage. The v0.4 changes affect rendering, not collection. No stress test, driver change or HWiNFO configuration change was performed.
 
-Not physically tested: internal/USB displays, AMD/Intel GPUs, multiple NVIDIA GPUs, other operating systems, thermal adapters, native packaging, Windows auto-start. The GitHub CI matrix checks core code on Windows and Linux but does not establish hardware support.
+The scene contains procedural 3D models with generated surface textures. It is a diorama prototype, not photorealistic art, a vehicle dynamics simulator or a fluid simulation. Mechanical tests do not establish that the artwork meets a particular aesthetic standard.
 
+Not physically tested: internal/USB displays, AMD/Intel GPUs, multiple NVIDIA GPUs, other operating systems, thermal adapters, native packaging or Windows auto-start. Resource budgets and sustained frame times on low-power hardware remain unmeasured. CI on Windows/Linux tests code rather than hardware compatibility.
