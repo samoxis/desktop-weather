@@ -1,6 +1,8 @@
-# Romanian countryside scene — v0.4
+# Romanian countryside scene
 
-**The procedural v0.4 appearance was rejected by the owner.** The accepted target is now the [photographic reference](approved-direction.md), approved on 2026-10-03. Its materials, proportions, lighting and composition are the visual baseline for the replacement. The descriptions below document the current renderer rather than the accepted final appearance.
+**Current production: v0.5 photographic composite.** The [approved reference](approved-direction.md), its clean day/night plates, material maps and photographic animals now drive the default scene. See [the implementation, asset provenance and generation instructions](photographic-animation.md). The unmodified approved PNG remains available in the explicitly static art-review view.
+
+**Historical v0.4 notes below:** the owner rejected this procedural appearance. Its modules and earlier assets are retained, but the default app does not load `world.mjs`. These notes document that earlier experiment.
 
 A circular Romanian village on a raised stone terrace, surrounded by continuous countryside. Actual WebGL geometry replaces the earlier illustrated scene and sprite overlays. The camera is fixed; this is a procedural 3D diorama, not an explorable or photorealistic game.
 

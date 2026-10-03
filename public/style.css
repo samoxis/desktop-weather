@@ -27,3 +27,4 @@ body.screen-mode #app{padding:0;max-width:none}body.screen-mode .toolbar,body.sc
 .scene[data-light=night] .scene-clock{background:#243948d9}
 .scene[data-engine="3d"] #weather{filter:none}.scene[data-engine="3d"] .light-wash{display:none}
 .scene[data-engine="art-review"] #weather{filter:none}.scene[data-engine="art-review"] .light-wash{display:none}
+.scene[data-engine="photographic-live"] #weather{filter:none}.scene[data-engine="photographic-live"] .light-wash{display:none}

@@ -1,16 +1,16 @@
 # Desktop Weather
 
-**Turn your PC sensor screen into a living miniature world.**
+**A Romanian countryside that moves with your PC.**
 
 A lively circular Romanian village that responds to CPU, GPU, memory, network and disk activity. Built for the small screen inside your case, the extra display on your desk, or a browser tab you leave open.
 
-![Desktop Weather — live 3D village with simulated telemetry](docs/preview-3d.png)
+![Desktop Weather — photographic scene with animated machinery and simulated telemetry](docs/preview-photographic.png)
 
 [Try the browser demo](https://samoxis.github.io/desktop-weather/?demo=idle) · [Telemetry explained](docs/telemetry.md) · [Research & decisions](docs/research.md) · [Contribute a scene](CONTRIBUTING.md)
 
-The replacement's [approved photographic direction](docs/approved-direction.md) can be viewed [inside the app](https://samoxis.github.io/desktop-weather/?view=art-review&demo=render). This view is explicitly static; sensor readings still work, but reference-image machinery does not move. The current procedural 3D appearance below is an intermediate version and does not meet that accepted visual target.
+The default scene now uses the [approved photographic direction](docs/approved-direction.md). Its unchanged original remains available in a separate [static art-review view](https://samoxis.github.io/desktop-weather/?view=art-review&demo=render).
 
-> **v0.4 replaces the illustrated prototype with a real WebGL 3D scene.** Buildings, machinery and animals are procedural meshes with textured materials and shadows. This remains an early prototype, not a photorealistic game. Browser demos use clearly labeled simulated values; live readings require the local companion.
+> **v0.5 combines a photographic background with independently animated 3D machinery.** A fixed camera preserves the village's detailed buildings, vegetation and surrounding landscape. Tractor tires and steering, both mills, masked water, droplets and photographic animal poses move separately. This is a 2.5D composite, not an explorable 3D village. Browser demos use clearly labeled simulated values; live readings require the local companion.
 
 ## What moves?
 
@@ -18,15 +18,15 @@ The replacement's [approved photographic direction](docs/approved-direction.md) 
 |---|---|
 | CPU utilization | Tractor speed, acceleration, four rotating tires and steering on a continuous village road |
 | GPU utilization | Wooden windmill rotation |
-| Memory utilization | Hay bales fill the barn courtyard |
-| Download + upload rate | 3D rain droplets, ground/roof impacts, river ripples and wetter materials, with a configurable scale |
-| Disk read + write rate | A wooden waterwheel on a fixed 3D axle, synchronized with flowing river shading and foam |
+| Memory utilization | Photographic hay bales fill the barn |
+| Download + upload rate | Small depth-scaled droplets, ground splashes, wet rings and a softer overcast appearance, with a configurable scale |
+| Disk read + write rate | A wooden waterwheel on a fixed 3D axle, synchronized with motion inside the photographed river channels |
 
-Birds with hinged wings, sheep and articulated chickens add ambient life; these are decorative and do not represent sensors. Tractor and mill motion stop at zero or unavailable load.
+Photographic hen walking/pecking poses, grazing sheep and swallow wing poses add ambient life. They are decorative; birds and night fireflies become more visible during GPU activity. Sensor-driven machinery stops at zero or unavailable load.
 
-The tractor follows a closed road loop, turns with the road tangent and steers its front wheels. Tire rotation uses traveled distance divided by each tire's radius; tread, rims and hubs rotate together. Bridges connect both river crossings. The wheel's rims, spokes and paddles rotate around one shared shaft. River shading and machinery share an animation phase; this is an artistic telemetry mapping rather than a fluid or vehicle physics simulation.
+The tractor follows a closed route, turns with the road tangent and steers its front wheels. Tire rotation integrates traveled distance divided by each tire's effective radius, accounting for its apparent scale in the background. Tread, rims and hubs rotate together. Photographic foreground masks hide it behind trees and buildings on the far circuit. The wheel's rims, spokes and paddles rotate around one shared shaft. River highlights and machinery use a shared flow rate; this is an artistic telemetry mapping rather than a fluid or vehicle physics simulation.
 
-Morning, golden-hour and moonlight appearances are selectable. Day and night change lighting in the same 3D world, with warm windows at night. Hills, trees, fields and a stream fill the surroundings. Automatic lighting follows your local clock, without location lookup. Usage drives the scene; **it is not a temperature gauge or thermal alarm**. The GPU temperature is shown separately.
+Morning, golden-hour and moonlight appearances are selectable. Aligned day/night photographic plates crossfade with matching machinery lighting and warm windows. Hills, trees, fields and a stream fill the surroundings. Automatic lighting follows your local clock, without location lookup. Usage drives the scene; **it is not a temperature gauge or thermal alarm**. The GPU temperature is shown separately.
 
 ## Run locally
 
@@ -75,9 +75,9 @@ Network defaults to the busiest measured adapter, rather than adding physical an
 
 Any screen recognized as a monitor by the OS can show the browser: HDMI, DisplayPort or a USB graphics display. Layouts were checked at 800×480, 480×800 and 1920×480, as well as regular desktop and small mobile widths. This is browser-layout validation, not a physical screen test.
 
-USB-only smart screens with proprietary protocols and cooler/AIO LCDs are **not supported in v0.4**. They need device-specific adapters. The camera adjusts to keep the circular scene visible in portrait layouts. Dedicated compositions remain on the roadmap.
+USB-only smart screens with proprietary protocols and cooler/AIO LCDs are **not supported in v0.5**. They need device-specific adapters. The full village stays visible in portrait and ultrawide layouts, with a softened photographic exterior filling the remaining space. Dedicated compositions remain on the roadmap.
 
-The 3D renderer consumes GPU resources itself. Smooth caps drawing at 60 FPS; Eco reduces resolution and shadow detail. These are targets, not performance guarantees. Resource budgets on low-power PCs still need measurement.
+The compositor and machinery renderer consume CPU/GPU resources themselves. Smooth caps drawing at 60 FPS; Eco lowers the machinery resolution and display pixel ratio. These are targets, not performance guarantees. Resource budgets on low-power PCs still need measurement.
 
 ## Local by design
 
@@ -106,5 +106,5 @@ No dependency installation or build step. `public/` is also the complete static 
 
 ## Credits & license
 
-Project code and included project artwork are offered under MIT terms. Three.js and its BufferGeometryUtils helper are bundled under their own [MIT license](public/vendor/THREE-LICENSE.txt), copyright the Three.js authors. The surface texture atlas was created with OpenAI image generation; the models and animation are code-generated. Earlier raster scene and sprite assets remain in the repository but are not used by v0.4. See [art provenance](docs/art-direction.md) and [research notes](docs/research.md).
+Project code and generated project artwork are offered under MIT terms. Three.js, BufferGeometryUtils and HDRLoader are bundled under their [MIT license](public/vendor/THREE-LICENSE.txt), copyright the Three.js authors. The photographic plates, material atlas and life sprites were created with OpenAI image generation; machinery models and animation are code-generated. Lighting uses Sergej Majboroda's CC0 [Rural Landscape HDRI](https://polyhaven.com/a/rural_landscape). Earlier experimental renderers/assets remain in Git history and retained source, but are not loaded by the default app. See [art provenance](docs/art-direction.md) and [research notes](docs/research.md).
 

@@ -24,7 +24,7 @@ let rural;
 try {
   rural = artReview
     ? await (await import('./art-review.mjs')).createArtReview(canvas)
-    : await (await import('./world.mjs')).createWorldRenderer(canvas);
+    : await (await import('./photo-world.mjs')).createPhotoWorld(canvas);
 } catch (error) {
   $('scene-title').textContent = 'The scene could not start.';
   $('scene-description').textContent = artReview ? 'The reference image could not load. Reload the page.' : 'Use a browser with WebGL 2 and hardware acceleration. If assets failed to load, reload the page.';
@@ -33,7 +33,7 @@ try {
   console.error('3D scene initialization failed', error);
   throw error;
 }
-scene.dataset.engine = artReview ? 'art-review' : '3d';
+scene.dataset.engine = artReview ? 'art-review' : 'photographic-live';
 if (artReview) {
   settings.light = 'morning';
   $('light').disabled = true; $('quality').disabled = true;
@@ -142,7 +142,7 @@ function draw(now) {
   const interval = still ? 1000 : settings.quality === 'smooth' ? 1000 / 60 : 1000 / 30;
   if (now - lastDraw < interval - 1) return;
   const dt = Math.min(.15, (now - lastDraw) / 1000 || .03); lastDraw = now; frameCount++;
-  for (const key of Object.keys(activity)) activity[key] += (target[key] - activity[key]) * (still ? 1 : 1-Math.exp(-dt*2.8));
+  for (const key of Object.keys(activity)) activity[key] = target[key] === 0 ? 0 : activity[key] + (target[key] - activity[key]) * (still ? 1 : 1-Math.exp(-dt*2.8));
 
   rural.render({activity,dt,time:still ? 0 : now / 1000,still,night:scene.dataset.light === 'night',dusk:scene.dataset.light === 'dusk',width,height,quality:settings.quality});
 }

@@ -1,8 +1,8 @@
 # Desktop Weather — photographic art reference
 
-This exact reference was approved by the owner on 2026-10-03 ("ok imaginea asta imi place"). It is a still art-direction reference, not proof of animated fidelity. Created with the built-in OpenAI image generation tool. The live v0.4 renderer does not yet match this reference.
+This exact reference was approved by the owner on 2026-10-03 ("ok imaginea asta imi place"). It is a still art-direction reference, not proof of animated fidelity. Created with the built-in OpenAI image generation tool. The v0.5 default renderer derives clean day/night plates from it and adds independently moving machinery and photographic life sprites.
 
-The unchanged PNG is preserved as `public/assets/romanian-approved-reference.png`. Open `?view=art-review&demo=render` to inspect it inside the app, with clearly labeled simulated sensor readings. The art-review view is explicitly static and uses no WebGL renderer; the default v0.4 view remains separate until replacement animation is ready.
+The unchanged PNG is preserved as `public/assets/romanian-approved-reference.png`. Open `?view=art-review&demo=render` to inspect it inside the app, with clearly labeled simulated sensor readings. The art-review view is explicitly static and uses no WebGL renderer. The default `?demo=render` view is animated; see [implementation and provenance](photographic-animation.md) and [validation](validation.md).
 
 ## Visual acceptance target
 

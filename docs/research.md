@@ -29,7 +29,7 @@ Research date: 2026-10-03. These references establish implementation direction; 
 
 ## Deliberate limits
 
-The scene is now realtime 3D, with procedural models and a fixed camera. Dedicated format-specific compositions would improve readability. GPU hardware validation covered NVIDIA only. No USB smart-screen protocol, AIO display integration, CPU thermal alarm, native `.exe`, auto-start or custom sensor mapping is claimed. Those are separate work items requiring hardware-backed testing.
+The current scene combines photographic plates and realtime machinery with a fixed camera. Dedicated format-specific compositions would improve readability. GPU hardware validation covered NVIDIA only. No USB smart-screen protocol, AIO display integration, CPU thermal alarm, native `.exe`, auto-start or custom sensor mapping is claimed. Those are separate work items requiring hardware-backed testing.
 
 ## v0.4 renderer research
 
@@ -40,3 +40,13 @@ The 2D overlays could not turn the vehicle or rotate its complete tires consiste
 - [Three.js MIT license](https://threejs.org/license/): redistribution terms for the locally bundled 0.186.1 renderer and utility.
 
 The vehicle follows road position/tangent and rolls tires from travel distance. The mill uses a real shared shaft. Rain now has 3D drops and impact rings; roof collisions remain approximate. These changes improve structural motion consistency but do not prove artistic quality or photorealism.
+
+## v0.5 photographic compositor
+
+The procedural village was rejected on appearance. The replacement preserves the owner-approved image's buildings and landscape, removes its baked moving objects through image editing and composites moving machinery onto the aligned photographic plate. This trades camera freedom for fidelity to the accepted composition. Animal poses and photo-space rain/water are raster effects; they are not full 3D animals or fluid simulation. Full-motion recording and foreground-mask inspection supplement mechanical tests.
+
+- [Poly Haven Rural Landscape](https://polyhaven.com/a/rural_landscape): Sergej Majboroda's natural rural HDRI, used for lighting/reflections on the machinery. The 1K HDR is bundled locally under CC0; no runtime network call.
+- [Poly Haven license](https://polyhaven.com/license): asset licensing and attribution guidance.
+- [Three.js HDRLoader](https://threejs.org/docs/pages/HDRLoader.html): local HDR parsing for environment lighting.
+
+No external image/video generation service, subscription or paid runtime API is required to run the scene.
