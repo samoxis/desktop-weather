@@ -2,7 +2,7 @@
 export function drawTractor(ctx, image, {x,y,scale,phase,load,reverse,night,moving,heading=.2,tireAngle=0}) {
   if (!image?.complete || !image.naturalWidth) return false;
   ctx.save();ctx.translate(x,y);ctx.scale(reverse ? -scale : scale,scale);
-  ctx.rotate(Math.max(-.14,Math.min(.14,heading-.2)));
+  // Keep the cab upright: rotating the entire photograph made tire contact slide.
   const contact=ctx.createRadialGradient(0,-4,2,0,-4,47);
   contact.addColorStop(0,night?'#070d17a0':'#2d241461');contact.addColorStop(1,'#2d241400');
   ctx.fillStyle=contact;ctx.beginPath();ctx.ellipse(0,-4,47,12,.12,0,Math.PI*2);ctx.fill();
@@ -13,7 +13,7 @@ export function drawTractor(ctx, image, {x,y,scale,phase,load,reverse,night,movi
     ctx.fillStyle=dust;ctx.beginPath();ctx.ellipse(-38-i*6,2,8+i,4+i*.3,0,0,Math.PI*2);ctx.fill();
   }
   ctx.filter=night?'brightness(.58) saturate(.72)':'brightness(.94) saturate(.86)';
-  const sway=moving?Math.sin(phase*80)*.35:0;
+  const sway=moving?Math.sin(phase*9)*.16:0;
   ctx.drawImage(image,-66,-84+sway,132,88);
   // Rotate each photographed wheel face in its perspective ellipse. Source
   // coordinates stay within the rims, keeping fenders and tire silhouettes fixed.
@@ -23,5 +23,20 @@ export function drawTractor(ctx, image, {x,y,scale,phase,load,reverse,night,movi
     ctx.beginPath();ctx.arc(0,0,1,0,Math.PI*2);ctx.clip();ctx.rotate(tireAngle*(cy<700?1:1.6));
     ctx.drawImage(image,cx-rx,cy-ry,rx*2,ry*2,-1,-1,2,2);ctx.restore();
   }
+  // Project tread grooves onto the rubber sidewall; unlike rotating a cutout,
+  // this keeps the silhouette, tire contact and illumination stationary.
+  for(const [cx,cy,rx,ry,multiplier] of [[351,607,139,196,1],[861,842,95,131,1.6]]){
+    ctx.save();ctx.translate(-66+cx*ratio,-84+sway+cy*ratio);
+    ctx.strokeStyle='#16171460';ctx.lineWidth=1.5*ratio*10;ctx.lineCap='round';
+    for(let lug=0;lug<18;lug++){
+      const a=lug*Math.PI/9+tireAngle*multiplier;
+      // The rear fender occludes the uppermost tread.
+      if(cy<700 && Math.sin(a)<-.83)continue;
+      ctx.beginPath();ctx.moveTo(Math.cos(a)*rx*ratio,Math.sin(a)*ry*ratio);
+      ctx.lineTo(Math.cos(a+.035)*(rx-14)*ratio,Math.sin(a+.035)*(ry-19)*ratio);ctx.stroke();
+    }
+    ctx.restore();
+  }
   ctx.restore();return true;
 }
+

@@ -36,7 +36,7 @@
       <div class="settings-heading"><h2>Make it your little world</h2><button id="close-settings" aria-label="Close settings">✕</button></div>
       <label>Data source<select id="mode"><option value="live">Live · this computer</option><option value="idle">Demo · quiet morning</option><option value="game">Demo · gaming</option><option value="render">Demo · rendering</option><option value="download">Demo · downloading</option></select></label>
       <label>Light<select id="light"><option value="morning">Morning</option><option value="dusk">Golden hour</option><option value="night">Moonlight</option><option value="auto">Follow the local clock</option></select></label>
-      <label>Animation<select id="quality"><option value="eco">Eco · 15 FPS</option><option value="balanced">Balanced · 30 FPS</option><option value="still">Still · no motion</option></select></label>
+      <label>Animation<select id="quality"><option value="smooth">Smooth · 60 FPS</option><option value="eco">Eco · 30 FPS</option><option value="balanced">Balanced · 30 FPS</option><option value="still">Still · no motion</option></select></label>
       <label>Rain at <span><output id="rain-output">25</output> MB/s<input id="rain-scale" type="range" min="1" max="100" value="25"></span></label>
       <label>GPU<select id="gpu-device"><option value="0">GPU 1 · awaiting readings</option></select></label>
       <label class="check"><input id="show-metrics" type="checkbox" checked> Show readings in screen mode</label>
@@ -48,3 +48,4 @@
   <script type="module" src="app.js"></script>
 </body>
 </html>
+

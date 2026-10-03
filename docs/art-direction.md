@@ -18,8 +18,17 @@ Canvas adds a contact shadow, CPU-driven travel, slight body movement, travel-de
 
 ## Motion and river revision
 
-The road uses a sampled smooth spline with distance-based travel. Acceleration, approach braking and a pause before reversal replace constant-speed ping-pong movement. Wheel-face rotation follows distance travelled. The sprite mirrors when changing direction at rest; this is still a layered 2D animation rather than a full 3D steering model.
+The road uses a sampled smooth spline with distance-based travel, limited to the front road where the camera angle matches the tractor. Acceleration, approach braking and a pause before reversing replace constant-speed ping-pong movement. The cab stays upright with no mirrored turn. The tractor backs up slowly. Wheel-face rotation and projected tread grooves follow travel using a 21-artwork-pixel rear rolling radius. This is still a layered 2D animation rather than a full 3D steering model.
 
-`public/assets/waterwheel-real.webp` is a new transparent photographic sprite, generated with the built-in OpenAI image generation tool and converted to WebP preserving alpha. Prompt: authentic old Romanian undershot mill wheel, straight-on circular centered face, weathered wet oak rim and radial spokes, iron bolts, paddle ends, transparent spoke gaps, natural upper-left lighting, no river/building/shadow/text. Canvas rotates it within a fixed perspective projection at the mill's axle.
+`public/assets/waterwheel-real.webp` provides the wood grain texture, generated with the built-in OpenAI image generation tool and converted to WebP preserving alpha. Prompt: authentic old Romanian undershot mill wheel, straight-on circular centered face, weathered wet oak rim and radial spokes, iron bolts, paddle ends, transparent spoke gaps, natural upper-left lighting, no river/building/shadow/text. The current renderer projects centered rim/spoke/paddle geometry with fixed depth and axle. It no longer rotates the perspective photograph. Windmill blades also use textured wooden slats.
 
 The river uses hand-mapped visible channel sections, with gaps around bridges. Two blended offset layers move the existing water texture within narrow channel masks; downstream foam strokes and wheel drips share the waterwheel phase. Disk I/O drives the common visual speed. Still/reduced-motion freezes it. This is an artistic telemetry mapping, not fluid simulation or actual river measurement.
+
+## Farm assets and frame pacing
+
+The built-in image generation tool produced two new transparent atlases, converted to WebP preserving alpha:
+
+- `public/assets/hens-real.webp`: a 3-by-2 sheet of one realistic brown farm hen, consistent slightly elevated camera, four walking poses, standing and pecking, articulated orange legs, detailed feathers, natural warm lighting. No cartoon styling, scenery, captions or grid lines. Walking frames blend; the bird walks briefly, then rests or pecks.
+- `public/assets/farm-real.webp`: three equal cells, a realistic cream-wool sheep grazing, the same sheep with head raised, and a rolled dry hay bale with straw texture, consistent elevated camera and warm lighting. Transparent background without captions or scenery. Replaces geometric sheep and bales.
+
+Smooth mode targets 60 FPS by default. Eco and Balanced cap at 30 FPS; Still and reduced-motion stop motion. Telemetry easing uses elapsed time instead of a frame-dependent fixed fraction. Earlier stored animation preferences migrate to Smooth once, except Still; subsequently selected preferences persist. No external rendering libraries or network asset dependencies were added.

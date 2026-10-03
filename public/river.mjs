@@ -1,3 +1,4 @@
+import { drawMechanicalWheel } from './mechanics.mjs';
 // Hand-mapped visible water channels; gaps keep foam off bridges, banks and rocks.
 export const CHANNELS = [
   [[.762,.551],[.753,.576],[.751,.604],[.741,.625]],
@@ -48,10 +49,7 @@ export function drawRiver(ctx,point,scale,waterPhase,night,waterImage=null){
 }
 export function drawWaterwheel(ctx,image,point,scale,angle,night){
   if(!image?.complete||!image.naturalWidth)return;
-  const [x,y]=point(.735,.672);
-  ctx.save();ctx.translate(x,y);ctx.transform(.72, .09, 0, 1, 0, 0);ctx.scale(scale,scale);
-  ctx.filter=night?'brightness(.60) saturate(.75)':'brightness(.83) saturate(.78)';
-  ctx.rotate(-angle);ctx.drawImage(image,-43,-43,86,86);ctx.restore();
+  drawMechanicalWheel(ctx,image,point,scale,angle,night);
   // Water drips from the rising paddles into the same visible channel.
   if(angle>0)for(let i=0;i<5;i++){
     const phase=(angle*.8+i*.21)%1;
@@ -60,3 +58,4 @@ export function drawWaterwheel(ctx,image,point,scale,angle,night){
     ctx.beginPath();ctx.moveTo(sx,sy);ctx.lineTo(sx-scale,sy+2.5*scale);ctx.stroke();
   }
 }
+

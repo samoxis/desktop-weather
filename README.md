@@ -8,7 +8,7 @@ A lively circular Romanian village that responds to CPU, GPU, memory, network an
 
 [Try the browser demo](https://samoxis.github.io/desktop-weather/?demo=idle) · [Telemetry explained](docs/telemetry.md) · [Research & decisions](docs/research.md) · [Contribute a scene](CONTRIBUTING.md)
 
-> **v0.2 is an early, working prototype:** an illustrated background with animated layers, not an explorable 3D city. Browser demos use clearly labeled simulated values. Live readings require the local companion.
+> **v0.3 is an early, working prototype:** an illustrated background with animated layers, not an explorable 3D city. Browser demos use clearly labeled simulated values. Live readings require the local companion.
 
 ## What moves?
 
@@ -22,7 +22,7 @@ A lively circular Romanian village that responds to CPU, GPU, memory, network an
 
 Birds, grazing sheep and wandering chickens add ambient life; these are decorative and do not represent sensors. Tractor and wheel motion stop at zero or unavailable load.
 
-The tractor follows a smooth road curve and brakes before changing direction. The river animation is mapped to the visible water channels, leaving bridges and banks intact. Both are layered 2D effects, not a physical vehicle or fluid simulation.
+The tractor follows a smooth road curve and brakes before slowly reversing, keeping the same cab orientation. The river animation is mapped to the visible water channels, leaving bridges and banks intact. Both are layered 2D effects, not a physical vehicle or fluid simulation.
 
 Morning, golden-hour and moonlight appearances are selectable. Day and night use matching cinematic Romanian countryside artwork; the exterior is filled with hills, fields, forest and a stream. Automatic lighting follows your local clock, without location lookup. Usage drives the scene; **it is not a temperature gauge or thermal alarm**. The GPU temperature is shown separately.
 
@@ -41,7 +41,7 @@ Open **http://127.0.0.1:4783**. On Windows you can also double-click `Start-Desk
 Move the browser onto the sensor screen. Use **F11** for the browser's fullscreen mode, then **K** to hide app controls. Press **K** again or use the faint exit button to restore them. The app's Fullscreen button is also available where supported.
 
 - **Settings → Data source** switches between live readings and four simulated scenarios.
-- **Settings → Animation** offers Eco (15 FPS cap), Balanced (30 FPS cap) and Still.
+- **Settings → Animation** offers Smooth (60 FPS cap, default), Eco (30 FPS cap with lower resolution), Balanced (30 FPS cap) and Still.
 - **Settings → GPU** selects an NVIDIA GPU on multi-GPU systems.
 - **Settings → Show readings in screen mode** lets you keep only the village.
 - **Settings → Rain at** calibrates the visual response to your connection speed. This is an animation scale, not a measurement of your connection's maximum speed.
@@ -73,7 +73,7 @@ Network defaults to the busiest measured adapter, rather than adding physical an
 
 Any screen recognized as a monitor by the OS can show the browser: HDMI, DisplayPort or a USB graphics display. Layouts were checked at 800×480, 480×800 and 1920×480, as well as regular desktop and small mobile widths. This is browser-layout validation, not a physical screen test.
 
-USB-only smart screens with proprietary protocols and cooler/AIO LCDs are **not supported in v0.2**. They need device-specific adapters. The full circular scene stays visible at all aspect ratios; portrait and ultrawide screens use a softened landscape extension around the illustration. Dedicated compositions remain on the roadmap.
+USB-only smart screens with proprietary protocols and cooler/AIO LCDs are **not supported in v0.3**. They need device-specific adapters. The full circular scene stays visible at all aspect ratios; portrait and ultrawide screens use a softened landscape extension around the illustration. Dedicated compositions remain on the roadmap.
 
 ## Local by design
 
@@ -103,3 +103,4 @@ No dependency installation or build step. `public/` is also the complete static 
 ## Credits & license
 
 Code is MIT licensed. The village background was created for this project using OpenAI image generation; it is AI-generated artwork, not a live 3D render. The included artwork is offered under the same MIT terms. No third-party project code or artwork was copied. Research references and the related projects are listed in [research notes](docs/research.md).
+

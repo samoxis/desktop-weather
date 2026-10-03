@@ -4,6 +4,7 @@ import { createRuralRenderer } from '../public/rural.mjs';
 import { sceneActivity, demoSnapshot } from '../public/model.mjs';
 import { drawTractor } from '../public/tractor.mjs';
 import {createTractorMotion,roadLength} from '../public/motion.mjs';
+import {wheelProjection} from '../public/mechanics.mjs';
 
 // Exercise the actual render loop with a no-op drawing surface.
 function renderer(){
@@ -46,7 +47,7 @@ test('Tractor accelerates, spins tires by distance and stops before changing dir
   const start=motion.step(0,1,false),first=motion.step(.1,1,false),second=motion.step(.1,1,false);
   assert.ok(first.speed>0 && second.speed>first.speed);
   assert.ok(first.speed<58);
-  assert.ok(Math.abs((second.tireAngle-start.tireAngle)-(second.distance-start.distance)/14)<1e-9);
+  assert.ok(Math.abs((second.tireAngle-start.tireAngle)-(second.distance-start.distance)/21)<1e-9);
   let previous=second,turned=false;
   for(let i=0;i<1000;i++){
     const next=motion.step(.1,1,false);
@@ -66,3 +67,15 @@ test('River and wheel share one phase, including when animation is frozen',()=>{
   world.render({activity,dt:.1,time:100,still:true,night:false,width:1672,height:941});
   assert.equal(world.stats.waterPhase,before.waterPhase);assert.equal(world.stats.tireAngle,before.tireAngle);
 });
+test('The waterwheel projection keeps its axle and projected radius fixed during rotation',()=>{
+  function bounds(angle){
+    const ring=Array.from({length:720},(_,i)=>wheelProjection(40*Math.cos(i*Math.PI/360+angle),40*Math.sin(i*Math.PI/360+angle),5));
+    return [Math.min(...ring.map(p=>p[0])),Math.max(...ring.map(p=>p[0])),Math.min(...ring.map(p=>p[1])),Math.max(...ring.map(p=>p[1]))];
+  }
+  const initial=bounds(0);
+  for(const angle of [.2,1,2,3,5]){
+    bounds(angle).forEach((edge,i)=>assert.ok(Math.abs(edge-initial[i])<.002));
+    assert.deepEqual(wheelProjection(0,0,5),[4.25,1]);
+  }
+});
+

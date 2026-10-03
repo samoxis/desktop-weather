@@ -1,5 +1,5 @@
 // Distances use the artwork's pixel coordinates, so wheels follow ground travel.
-export const ROAD = [[.275,.554],[.274,.586],[.302,.621],[.37,.650],[.45,.688],[.53,.713],[.59,.721]];
+export const ROAD = [[.325,.633],[.37,.650],[.45,.688],[.53,.713],[.59,.721]];
 const metric = p => [p[0]*1672,p[1]*941];
 const table=[];
 let length=0, previous;
@@ -29,10 +29,10 @@ export function createTractorMotion(){
         else if(pause>0){pause=Math.max(0,pause-dt);if(pause===0)direction*=-1;}
         else{
           const remaining=direction>0?length-distance:distance;
-          const target=Math.min(10+load*48,Math.sqrt(2*35*remaining));
+          const target=Math.min((8+load*32)*(direction>0?1:.48),Math.sqrt(2*35*remaining));
           speed+=(target-speed)*(1-Math.exp(-dt*3));
           const travel=Math.min(remaining,speed*dt);
-          distance+=travel*direction;tireAngle+=travel/14*direction;
+          distance+=travel*direction;tireAngle+=travel/21*direction;
           if(remaining-travel<.12){distance=direction>0?length:0;speed=0;pause=1.2;}
         }
       }
@@ -40,3 +40,4 @@ export function createTractorMotion(){
     }
   };
 }
+
