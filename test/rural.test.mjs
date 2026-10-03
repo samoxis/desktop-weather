@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createRuralRenderer } from '../public/rural.mjs';
 import { sceneActivity, demoSnapshot } from '../public/model.mjs';
+import { drawTractor } from '../public/tractor.mjs';
 
 // Exercise the actual render loop with a no-op drawing surface.
 function renderer(){
@@ -29,4 +30,13 @@ test('Missing telemetry stops machinery and removes sensor-derived bales and rai
   world.render({...frame,time:2});
   assert.deepEqual(world.stats,before);
   assert.equal(before.hayBales,0);assert.equal(before.rainDrops,0);
+});
+test('Tractor waits for a decoded sprite and draws it with the night lighting',()=>{
+  let draws=0, appliedFilter;
+  const context=new Proxy({}, {get:(_,key)=>key==='createRadialGradient'?()=>({addColorStop(){}}):key==='drawImage'?()=>draws++:()=>{},set:(_,key,value)=>{if(key==='filter')appliedFilter=value;return true;}});
+  const frame={x:50,y:50,scale:1,phase:0,load:0,reverse:false,night:true,moving:false};
+  assert.equal(drawTractor(context,null,frame),false);
+  assert.equal(draws,0);
+  assert.equal(drawTractor(context,{complete:true,naturalWidth:1536},frame),true);
+  assert.equal(draws,1);assert.match(appliedFilter,/brightness/);
 });

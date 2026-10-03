@@ -1,4 +1,5 @@
 import { clamp } from './model.mjs';
+import { drawTractor } from './tractor.mjs';
 
 // Coordinates refer to the Romanian scene, not to the browser viewport.
 export const ROAD = [[.273,.546],[.30,.596],[.36,.636],[.44,.678],[.53,.709],[.596,.713]];
@@ -31,25 +32,6 @@ function hayBale(ctx,x,y,s){
   for(const radius of [2,4,6]){ctx.beginPath();ctx.ellipse(-4,-7,radius*.7,radius,0,0,Math.PI*2);ctx.stroke();}
   line(ctx,[[4,-14],[4,0]],'#6f623b',1);ctx.restore();
 }
-function wheel(ctx, x, y, radius, rotation) {
-  ellipse(ctx,x,y,radius,radius,'#292d28'); ellipse(ctx,x,y,radius*.64,radius*.64,'#7f8379'); ellipse(ctx,x,y,radius*.25,radius*.25,'#e8d3a5');
-  for(let i=0;i<8;i++){const a=i*Math.PI/4+rotation;line(ctx,[[x+Math.cos(a)*radius*.76,y+Math.sin(a)*radius*.76],[x+Math.cos(a)*radius*.96,y+Math.sin(a)*radius*.96]],'#51534b',2);}
-}
-function tractor(ctx, x, y, scale, rotation, phase, load, reverse) {
-  ctx.save();ctx.translate(x,y);ctx.scale(reverse ? -scale : scale,scale);ctx.rotate(rotation);shadow(ctx,33,7);
-  wheel(ctx,-19,-1,12,phase*10);wheel(ctx,22,2,8,phase*14);
-  const green=ctx.createLinearGradient(0,-28,0,2);green.addColorStop(0,'#94b45b');green.addColorStop(1,'#456a38');
-  ctx.fillStyle=green;ctx.fillRect(-13,-21,38,17);ctx.fillStyle='#496039';ctx.fillRect(-21,-30,19,9);
-  ctx.fillStyle='#c4e5e5';ctx.fillRect(-17,-30,12,14);ctx.fillStyle='#4d6951';ctx.fillRect(-20,-35,19,5);
-  line(ctx,[[-19,-14],[-19,-33],[-2,-33],[-2,-12]],'#35523c',2);line(ctx,[[12,-21],[12,-32]],'#4d5041',3);
-  ctx.fillStyle='#e2c576';ctx.fillRect(24,-17,4,7);ctx.fillStyle='#244435';ctx.fillRect(19,-18,6,10);
-  for(let i=0;i<4;i++)line(ctx,[[20+i,-17],[20+i,-9]],'#92a57d',.7);
-  ctx.fillStyle='#b39875';ctx.fillRect(-48,-8,21,11);line(ctx,[[-27,0],[-20,0]],'#80684b',2);wheel(ctx,-40,4,5,phase*14);
-  ctx.fillStyle='#d8b85d';ctx.fillRect(-46,-18,17,10);line(ctx,[[-43,-18],[-43,-9]],'#a18545',1);
-  // A load-proportional dust trail, clearly distinct from thermal smoke.
-  for(let i=0;i<Math.round(load*8);i++)ellipse(ctx,-35-i*7+Math.sin(phase+i)*3,6-i*2,5+i,2+i*.4,`rgba(205,176,127,${.17*(1-i/10)})`);
-  ctx.restore();
-}
 function rotor(ctx, x, y, scale, angle, water = false) {
   ctx.save();ctx.translate(x,y);ctx.scale(scale,scale);ctx.rotate(angle);
   if(water){
@@ -72,7 +54,7 @@ function chicken(ctx,x,y,scale,time){
   ellipse(ctx,0,-3,5,4,'#f8ebcc');ellipse(ctx,4,-6,3,3,'#fff2d7');ellipse(ctx,4,-9,2,1.4,'#c45646');line(ctx,[[6,-6],[9,-5]],'#d6a143',1.8);line(ctx,[[-3,-4],[-7,-7]],'#8b754a',2);ctx.restore();
 }
 
-export function createRuralRenderer(ctx, point, sceneScale) {
+export function createRuralRenderer(ctx, point, sceneScale, tractorImage = null) {
   let tractorProgress=.26,millAngle=0,wheelAngle=0,lastStats={};
   const motes=Array.from({length:150},(_,i)=>({x:((i*47+17)%149)/149,y:((i*31+3)%137)/137,phase:i*1.7}));
   return {
@@ -80,7 +62,7 @@ export function createRuralRenderer(ctx, point, sceneScale) {
     render({ activity, dt, time, still, night, width, height }) {
       const rates=ruralRates(activity),s=sceneScale();
       if(!still){tractorProgress=(tractorProgress+dt*rates.tractor)%2;millAngle+=dt*rates.mill;wheelAngle+=dt*rates.wheel;}
-      lastStats={tractorProgress,millAngle,wheelAngle,hayBales:rates.hay,rainDrops:rates.rain};
+      lastStats={tractorProgress,millAngle,wheelAngle,hayBales:rates.hay,rainDrops:rates.rain,tractorLoaded:Boolean(tractorImage?.complete && tractorImage.naturalWidth)};
       // Ambient birds and grazing animals are decorative; meters describe the telemetry mapping.
       for(let i=0;i<4;i++){const p=motes[i],x=((p.x+time*.007)%1)*width,y=(.1+p.y*.12+Math.sin(time+i)*.003)*height;line(ctx,[[x-5,y],[x,y+Math.sin(time*4+i)*2],[x+5,y]],night?'#cbd7d075':'#47594b90',1.5);}
       for(let i=0;i<6;i++){const [x,y]=point(.64+(i%3)*.02+Math.sin(time*.32+i)*.006,.36+Math.floor(i/3)*.017);sheep(ctx,x,y,s*.8,time,i);}
@@ -92,7 +74,7 @@ export function createRuralRenderer(ctx, point, sceneScale) {
       // RAM: fill the visible courtyard with neatly stacked bales, not barely visible glows.
       for(let i=0;i<rates.hay;i++){const col=i%6,row=Math.floor(i/6),[x,y]=point(.506+col*.014,.457-row*.012);hayBale(ctx,x,y,s);}
       // Road vehicle speed and dust visibly follow CPU load; stops at zero/unavailable.
-      {const reverse=tractorProgress>1,[rx,ry]=routePoint(reverse ? 2-tractorProgress : tractorProgress),[x,y]=point(rx,ry);tractor(ctx,x,y,s*1.1,.08,still?0:time,activity.wind,reverse);}
+      {const reverse=tractorProgress>1,[rx,ry]=routePoint(reverse ? 2-tractorProgress : tractorProgress),[x,y]=point(rx,ry);drawTractor(ctx,tractorImage,{x,y,scale:s*(.82+ry*.28),phase:tractorProgress,load:activity.wind,reverse,night,moving:!still && rates.tractor>0});}
       // Upload and download are combined for the rain scale, with an intentionally gentle ceiling.
       if(rates.rain){
         const [cloudX,cloudY]=point(.87,.10);
@@ -108,3 +90,4 @@ export function createRuralRenderer(ctx, point, sceneScale) {
     }
   };
 }
+

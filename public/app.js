@@ -20,7 +20,9 @@ let inScreenMode = params.get('screen') === '1', fetchBusy = false;
 const media = matchMedia('(prefers-reduced-motion: reduce)');
 const scene = $('scene'), canvas = $('weather'), context = canvas.getContext('2d');
 let width = 1, height = 1, lastDraw = 0, frameCount = 0;
-const rural = createRuralRenderer(context, scenePoint, () => Math.min(width / 1672, height / 941));
+const tractorImage = new Image();
+tractorImage.src = new URL('./assets/tractor-real.webp', import.meta.url).href;
+const rural = createRuralRenderer(context, scenePoint, () => Math.min(width / 1672, height / 941), tractorImage);
 
 function persist() {
   try { localStorage.setItem('desktop-weather-settings', JSON.stringify({ light: settings.light, quality: settings.quality, rainScale: settings.rainScale, gpuIndex: settings.gpuIndex, showMetrics: settings.showMetrics })); } catch { }
@@ -159,3 +161,4 @@ media.addEventListener('change', resize);
 window.desktopWeather = { get state() { return { mode: settings.mode, connection, activity: { ...target }, frames: frameCount, animation: rural.stats }; } };
 updateSettings(); screenMode(inScreenMode); renderReadings(); sample();
 setInterval(sample, 3000); requestAnimationFrame(draw);
+
